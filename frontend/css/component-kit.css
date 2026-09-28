@@ -1,0 +1,363 @@
+/*
+ * ClipFender Component Kit — Stage 1
+ * Reusable primitives for buttons, inputs, icon buttons, checks, switches and states.
+ * Does not override legacy classes. Prefix: .cfk-*
+ */
+
+.cfk-shell {
+  font-family: var(--font-body);
+  color: var(--text-muted);
+  background:
+    radial-gradient(circle at 50% 0%, var(--gold-08), transparent 34%),
+    linear-gradient(180deg, var(--bg-0), #090a0c 58%, #07080a);
+}
+
+.cfk-metal {
+  position: relative;
+  isolation: isolate;
+  background:
+    linear-gradient(180deg, rgba(27, 28, 32, .96), rgba(18, 19, 22, .98)),
+    linear-gradient(135deg, rgba(139, 109, 58, .10), transparent 42%);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-0);
+  box-shadow: var(--shadow-panel), var(--inset-metal);
+}
+
+.cfk-metal::before,
+.cfk-metal::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.cfk-metal::before {
+  inset: 7px;
+  border: 1px solid rgba(200, 155, 60, .10);
+  z-index: -1;
+}
+
+.cfk-metal::after {
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 0 8%, var(--gold-16) 50%, transparent 92%) 0 100% / 100% 1px no-repeat,
+    linear-gradient(180deg, rgba(255,255,255,.018), transparent 26%);
+  opacity: .9;
+  z-index: -1;
+}
+
+/* Buttons */
+.cfk-btn {
+  --cfk-btn-bg: linear-gradient(180deg, #1C1D21, #111215);
+  --cfk-btn-border: var(--bronze-24);
+  --cfk-btn-color: var(--text-muted);
+  --cfk-btn-glow: rgba(200, 155, 60, .12);
+
+  min-height: var(--control-h);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 18px;
+  border: 1px solid var(--cfk-btn-border);
+  border-radius: 0;
+  background: var(--cfk-btn-bg);
+  color: var(--cfk-btn-color);
+  font: 500 14px/1 var(--font-body);
+  letter-spacing: 1px;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.02), 0 8px 22px rgba(0,0,0,.22);
+  transition:
+    transform var(--dur-hover) var(--ease-ui),
+    border-color var(--dur-hover) var(--ease-ui),
+    box-shadow var(--dur-hover) var(--ease-ui),
+    color var(--dur-hover) var(--ease-ui),
+    filter var(--dur-hover) var(--ease-ui);
+}
+
+.cfk-btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--gold-58);
+  color: var(--gold-light);
+  box-shadow:
+    inset 0 0 0 1px rgba(224,184,106,.05),
+    0 10px 28px rgba(0,0,0,.28),
+    0 0 22px var(--cfk-btn-glow);
+}
+
+.cfk-btn:active {
+  transform: translateY(0) scale(.985);
+  transition-duration: var(--dur-press-max);
+}
+
+.cfk-btn:focus-visible,
+.cfk-input:focus-visible,
+.cfk-select:focus-visible,
+.cfk-icon-btn:focus-visible,
+.cfk-check input:focus-visible + span,
+.cfk-switch input:focus-visible + span {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.cfk-btn:disabled,
+.cfk-btn[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: .42;
+  filter: saturate(.6);
+  transform: none;
+  box-shadow: none;
+}
+
+.cfk-btn--primary {
+  --cfk-btn-bg: linear-gradient(180deg, #5A3D14, #291C0C);
+  --cfk-btn-border: rgba(200, 155, 60, .68);
+  --cfk-btn-color: #F2DFC0;
+  --cfk-btn-glow: rgba(200, 155, 60, .20);
+}
+
+.cfk-btn--secondary {
+  --cfk-btn-bg: linear-gradient(180deg, #1B1C20, #101114);
+  --cfk-btn-border: rgba(139, 109, 58, .46);
+  --cfk-btn-color: #C6B99E;
+}
+
+.cfk-btn--danger {
+  --cfk-btn-bg: linear-gradient(180deg, #3A1715, #1A0C0B);
+  --cfk-btn-border: rgba(138, 30, 30, .62);
+  --cfk-btn-color: #E3BBB5;
+  --cfk-btn-glow: rgba(138, 30, 30, .18);
+}
+
+.cfk-btn--text {
+  --cfk-btn-bg: transparent;
+  --cfk-btn-border: transparent;
+  --cfk-btn-color: var(--gold-light);
+  padding-inline: 6px;
+  box-shadow: none;
+}
+
+.cfk-btn--text:hover {
+  border-color: transparent;
+  box-shadow: none;
+  text-shadow: var(--text-shadow-gold);
+}
+
+.cfk-btn--icon {
+  width: 44px;
+  padding: 0;
+}
+
+/* Inputs */
+.cfk-field {
+  display: grid;
+  gap: 8px;
+}
+
+.cfk-label {
+  font: 500 11px/1.2 var(--font-body);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--gold-light);
+}
+
+.cfk-input,
+.cfk-select {
+  min-height: var(--control-h);
+  width: 100%;
+  padding: 0 14px;
+  border: 1px solid rgba(62, 58, 52, .92);
+  border-radius: 0;
+  background:
+    linear-gradient(180deg, rgba(18,19,22,.96), rgba(11,12,15,.98)),
+    var(--bg-1);
+  color: var(--text-muted);
+  font: 400 14px/1.3 var(--font-body);
+  letter-spacing: .5px;
+  box-shadow: inset 0 0 20px rgba(0,0,0,.28);
+  transition:
+    border-color var(--dur-hover) var(--ease-ui),
+    box-shadow var(--dur-hover) var(--ease-ui),
+    background var(--dur-hover) var(--ease-ui);
+}
+
+.cfk-input::placeholder { color: var(--text-dim); }
+.cfk-input:hover,
+.cfk-select:hover { border-color: rgba(139,109,58,.55); }
+.cfk-input:focus,
+.cfk-select:focus {
+  border-color: var(--gold);
+  background: linear-gradient(180deg, rgba(27,28,32,.98), rgba(13,14,17,.99));
+  box-shadow: inset 0 0 24px rgba(0,0,0,.34), 0 0 20px rgba(200,155,60,.07);
+  outline: none;
+}
+
+/* Icon buttons */
+.cfk-icon-btn {
+  width: 44px;
+  height: 44px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(139,109,58,.35);
+  border-radius: 0;
+  background: rgba(18,19,22,.88);
+  color: var(--gold-light);
+  cursor: pointer;
+  transition: transform var(--dur-micro-min) var(--ease-ui), border-color var(--dur-hover) var(--ease-ui), box-shadow var(--dur-hover) var(--ease-ui);
+}
+
+.cfk-icon-btn:hover {
+  transform: translateY(-1px) rotate(-1deg);
+  border-color: var(--gold-58);
+  box-shadow: 0 0 18px rgba(200,155,60,.11);
+}
+
+.cfk-icon-btn svg { width: var(--icon-md); height: var(--icon-md); fill: none; stroke: currentColor; stroke-width: 1.4; }
+
+/* Heraldic check */
+.cfk-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cfk-check input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cfk-check span {
+  width: 18px;
+  height: 18px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--bronze);
+  background: linear-gradient(180deg, #17191C, #0D0F11);
+  color: var(--gold-light);
+  transition: background var(--dur-micro-min) var(--ease-ui), border-color var(--dur-micro-min) var(--ease-ui), box-shadow var(--dur-micro-min) var(--ease-ui), transform var(--dur-micro-min) var(--ease-ui);
+}
+
+.cfk-check span::after {
+  content: "";
+  width: 8px;
+  height: 4px;
+  border-left: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg) scale(0);
+  transition: transform var(--dur-micro-min) var(--ease-ui);
+}
+
+.cfk-check:hover span { border-color: var(--gold); box-shadow: 0 0 12px rgba(200,155,60,.12); }
+.cfk-check input:checked + span {
+  background: linear-gradient(180deg, #503615, #23180B);
+  border-color: var(--gold);
+  box-shadow: 0 0 15px rgba(200,155,60,.14);
+}
+.cfk-check input:checked + span::after { transform: rotate(-45deg) scale(1); }
+
+/* Switch */
+.cfk-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cfk-switch input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cfk-switch span {
+  position: relative;
+  width: 46px;
+  height: 24px;
+  border: 1px solid rgba(139,109,58,.42);
+  background: linear-gradient(180deg, #15171A, #0D0F11);
+  transition: border-color var(--dur-micro-min) var(--ease-ui), box-shadow var(--dur-micro-min) var(--ease-ui);
+}
+
+.cfk-switch span::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(180deg, #6F685B, #3F3B35);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.05), 0 2px 8px rgba(0,0,0,.38);
+  transition: transform var(--dur-micro-min) var(--ease-ui), background var(--dur-micro-min) var(--ease-ui), box-shadow var(--dur-micro-min) var(--ease-ui);
+}
+
+.cfk-switch:hover span { border-color: var(--gold); }
+.cfk-switch input:checked + span {
+  border-color: rgba(200,155,60,.68);
+  box-shadow: 0 0 14px rgba(200,155,60,.09);
+}
+.cfk-switch input:checked + span::before {
+  transform: translateX(20px);
+  background: linear-gradient(180deg, #E0B86A, #9C712B);
+  box-shadow: 0 0 10px rgba(200,155,60,.18);
+}
+
+/* System state blocks */
+.cfk-state {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 14px 16px;
+  background: linear-gradient(180deg, rgba(18,19,22,.97), rgba(10,11,13,.98));
+  border: 1px solid var(--border-dark);
+  box-shadow: var(--shadow-panel), inset 0 0 20px rgba(0,0,0,.3);
+}
+
+.cfk-state__icon {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid currentColor;
+  color: var(--gold-light);
+  font: 600 14px/1 var(--font-display);
+}
+
+.cfk-state__title { font: 600 12px/1.2 var(--font-body); letter-spacing: 1px; text-transform: uppercase; color: var(--gold-light); }
+.cfk-state__text { margin-top: 4px; font: 400 13px/1.5 var(--font-body); color: var(--text-muted); }
+.cfk-state--success { border-color: rgba(46,125,50,.42); }
+.cfk-state--success .cfk-state__icon { color: #7FB985; }
+.cfk-state--info { border-color: rgba(139,109,58,.32); }
+.cfk-state--error { border-color: rgba(138,30,30,.56); }
+.cfk-state--error .cfk-state__icon { color: #D07A72; }
+
+.cfk-divider {
+  height: 1px;
+  border: 0;
+  background: linear-gradient(90deg, transparent, var(--gold-38), transparent);
+}
+
+.cfk-caption {
+  font: 500 10px/1.2 var(--font-body);
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cfk-btn,
+  .cfk-input,
+  .cfk-select,
+  .cfk-icon-btn,
+  .cfk-check span,
+  .cfk-check span::after,
+  .cfk-switch span,
+  .cfk-switch span::before {
+    transition-duration: 1ms !important;
+  }
+}

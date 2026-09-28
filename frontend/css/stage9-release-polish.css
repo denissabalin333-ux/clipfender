@@ -1,0 +1,89 @@
+/* CLIPFENDER Stage 9 — release polish.
+   Keeps artwork readable while preserving the existing visual language. */
+
+/* Search is part of the first viewport; atmosphere stays behind it. */
+.home-stage3__center,
+.cf8-hero,
+.cf8-mode-switch {
+  position: relative;
+  z-index: 8;
+}
+
+.home-stage3__search,
+.cf8-form,
+.cf8-panel--controls {
+  position: relative;
+  z-index: 9;
+}
+
+.home-stage3__scene,
+.home-stage3__fog,
+.home-stage3__veil,
+.home-stage3__embers {
+  pointer-events: none;
+}
+
+/* Keep photographs and video thumbnails crisp; overlays live on the container. */
+.cf-character-card__art,
+.cf-character-card-v7 .portrait img,
+.cf-character-grid-v7 img,
+.cf-popular-grid img,
+.cf-profile-result__card img,
+.cf10-character-art img,
+.cf8-thumb img,
+.cf8-stage-card__img img,
+.video-card .thumbnail,
+.video-card img,
+.panel-art,
+.work-thumb-rich,
+.featured-visual,
+.project-map-art,
+.workshop-panel,
+.auth-art {
+  filter: none;
+}
+
+/* One restrained darkening layer over the home photograph; the old veil is inert. */
+.home-stage3__veil {
+  opacity: 0;
+  background: transparent !important;
+}
+
+/* The generic page overlay is content-safe, not an opaque wash. */
+.cf-v7-page::after {
+  z-index: 0;
+}
+
+.cf-v7-page > .cf-v7-shell,
+.cf-new-page > .cf-new-shell,
+.cf-search-page__content > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Header is always the top interaction layer. */
+.cf2-header {
+  position: sticky;
+  top: 0;
+  z-index: 500;
+}
+
+/* Avoid visual overflow escaping the document shell. */
+.cf-v7-page,
+.cf-new-page,
+.cf8-search-page,
+.home-stage3 {
+  overflow: clip;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-stage3__scene,
+  .home-stage3__fog,
+  .home-stage3__veil,
+  .cf8-panel,
+  .cf8-result-card,
+  .cf8-stage-card {
+    animation: none !important;
+    transition: none !important;
+  }
+}

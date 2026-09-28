@@ -1,0 +1,4 @@
+body.video-page .cf-video-layout {
+  position: relative;
+  z-index: var(--z-content);
+}

@@ -1,0 +1,4 @@
+body.character-search-page > .cf2-header,
+body.character-search-page .cf2-header {
+  z-index: var(--z-header);
+}

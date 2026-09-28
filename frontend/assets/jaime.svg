@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 760">
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#2a201b"/><stop offset=".55" stop-color="#111416"/><stop offset="1" stop-color="#090a0b"/></linearGradient>
+ <radialGradient id="glow"><stop stop-color="#b88443" stop-opacity=".34"/><stop offset="1" stop-color="#b88443" stop-opacity="0"/></radialGradient>
+ <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e2c39e"/><stop offset="1" stop-color="#8e6b55"/></linearGradient>
+ <linearGradient id="cloak" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1a1a19"/><stop offset="1" stop-color="#080a0c"/></linearGradient>
+ <linearGradient id="armor" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#9a845f"/><stop offset=".5" stop-color="#6f6559"/><stop offset="1" stop-color="#17191a"/></linearGradient>
+ <filter id="soft"><feGaussianBlur stdDeviation="28"/></filter>
+ <filter id="shadow"><feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#000" flood-opacity=".7"/></filter>
+</defs>
+<rect width="600" height="760" fill="url(#bg)"/>
+<circle cx="420" cy="180" r="190" fill="url(#glow)" filter="url(#soft)"/>
+<path d="M28 28H572V732H28Z" fill="none" stroke="#a98956" stroke-opacity=".20"/>
+<path d="M0 610 Q150 520 300 560 T600 540V760H0Z" fill="#1a1a19" opacity=".22"/>
+<!-- shoulder/cape -->
+<path d="M82 760 Q90 590 190 515 L300 485 L410 515 Q510 590 518 760Z" fill="url(#cloak)" filter="url(#shadow)"/>
+<!-- armor -->
+<path d="M125 735 Q150 590 230 538 L300 510 L370 538 Q450 590 475 735Z" fill="url(#armor)" stroke="#a58b67" stroke-opacity=".32" stroke-width="5"/>
+<path d="M202 566 Q300 630 398 566" fill="none" stroke="#d4b47b" stroke-opacity=".30" stroke-width="5"/>
+<path d="M295 555 L295 720" stroke="#d5b06a" stroke-opacity=".18" stroke-width="4"/>
+<!-- neck -->
+<path d="M255 425 L345 425 L355 525 Q300 555 245 525Z" fill="url(#skin)"/>
+<!-- head -->
+<ellipse cx="300" cy="325" rx="112" ry="146" fill="url(#skin)" stroke="#3a302a" stroke-width="4"/>
+<!-- hair / headwear -->
+<path d="M190 336 Q172 177 301 160 Q431 177 410 340 L386 281 Q356 224 298 224 Q244 226 208 283Z" fill="#6a3f27" stroke="#171313" stroke-width="7"/>
+<!-- ears -->
+<ellipse cx="191" cy="338" rx="18" ry="30" fill="#9d765e" opacity=".85"/><ellipse cx="409" cy="338" rx="18" ry="30" fill="#9d765e" opacity=".85"/>
+<!-- brows / eyes -->
+<path d="M232 316 Q260 296 281 311" fill="none" stroke="#4c3a31" stroke-width="9" stroke-linecap="round"/>
+<path d="M319 311 Q344 296 369 316" fill="none" stroke="#4c3a31" stroke-width="9" stroke-linecap="round"/>
+<ellipse cx="258" cy="328" rx="9" ry="6" fill="#141414"/><ellipse cx="342" cy="328" rx="9" ry="6" fill="#141414"/>
+<circle cx="261" cy="326" r="2.2" fill="#e9d8b7"/><circle cx="345" cy="326" r="2.2" fill="#e9d8b7"/>
+<!-- nose / mouth -->
+<path d="M300 331 L288 379 Q300 388 312 379" fill="none" stroke="#765647" stroke-width="5" stroke-linecap="round"/>
+<path d="M266 414 Q300 433 334 414" fill="none" stroke="#553a34" stroke-width="6" stroke-linecap="round"/>
+<!-- beard / makeup variations -->
+<path d="M236 396 Q300 450 364 396 L351 460 Q300 500 249 460Z" fill="#251f1f" opacity=".72"/>
+
+<!-- emblem / clasp -->
+<circle cx="300" cy="555" r="27" fill="#0c1012" stroke="#b88443" stroke-width="4" opacity=".95"/>
+<path d="M300 534 L309 551 L328 554 L313 567 L317 586 L300 576 L283 586 L287 567 L272 554 L291 551Z" fill="#b88443" opacity=".75"/>
+<!-- atmosphere -->
+<g fill="#b88443" opacity=".5"><circle cx="104" cy="124" r="2"/><circle cx="505" cy="260" r="2"/><circle cx="466" cy="94" r="1.8"/><circle cx="134" cy="422" r="1.5"/></g>
+<text x="36" y="700" fill="#f0d8ab" font-family="Georgia,serif" font-size="19" letter-spacing="4" opacity=".72">ЛАННИСТЕР</text>
+</svg>

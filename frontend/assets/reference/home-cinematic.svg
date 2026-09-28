@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 900" fill="none">
+<defs>
+ <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#04080b"/><stop offset=".58" stop-color="#0a1013"/><stop offset="1" stop-color="#050607"/></linearGradient>
+ <linearGradient id="stone" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#3b3a35"/><stop offset=".68" stop-color="#181a1a"/><stop offset="1" stop-color="#0a0c0d"/></linearGradient>
+ <linearGradient id="stone2" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#514b41"/><stop offset="1" stop-color="#121517"/></linearGradient>
+ <radialGradient id="moon"><stop stop-color="#efe1b3" stop-opacity=".78"/><stop offset=".32" stop-color="#d5b77b" stop-opacity=".20"/><stop offset="1" stop-color="#c39b5c" stop-opacity="0"/></radialGradient>
+ <linearGradient id="warm" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f5c86d"/><stop offset="1" stop-color="#9d662b"/></linearGradient>
+ <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency=".78" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="table" tableValues="0 .08"/></feComponentTransfer></filter>
+ <filter id="glow"><feGaussianBlur stdDeviation="13" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="1800" height="900" fill="url(#sky)"/>
+<!-- distant mountains -->
+<path d="M0 450 L150 350 260 420 400 300 520 410 650 330 790 430 900 335 1040 420 1160 300 1290 410 1440 290 1600 400 1720 340 1800 410 V610 H0 Z" fill="#0a1012"/>
+<path d="M0 500 L180 410 320 470 455 360 600 470 730 390 900 500 1040 390 1190 470 1350 370 1510 480 1670 390 1800 470 V650 H0 Z" fill="#0d1316" opacity=".78"/>
+<!-- warm moon -->
+<circle cx="1435" cy="156" r="150" fill="url(#moon)"/><circle cx="1435" cy="156" r="34" fill="#ead9aa" opacity=".46" filter="url(#glow)"/>
+<!-- left sword silhouettes -->
+<g opacity=".42" stroke="#1b2326" stroke-width="16" stroke-linecap="round">
+ <path d="M110 710 L180 175 M220 710 L275 220 M335 710 L390 165 M450 710 L495 245"/>
+ <path d="M120 530 L185 530 M225 480 L290 480 M340 505 L402 505 M456 470 L520 470"/>
+</g>
+<!-- great castle mass -->
+<path d="M520 620 V355 L575 318 L630 355 V275 L710 220 L790 275 V318 L846 275 902 318 V210 L1000 154 1098 210 V318 L1150 275 1206 318 V250 L1284 205 1362 250 V620 Z" fill="url(#stone2)" stroke="#8e754d" stroke-width="4"/>
+<!-- roofs -->
+<path d="M565 318 L630 230 695 318 Z" fill="#0a0c0e" stroke="#7e6744" stroke-width="4"/>
+<path d="M712 220 L790 105 868 220 Z" fill="#0a0c0e" stroke="#846b46" stroke-width="4"/>
+<path d="M901 210 L1000 72 1099 210 Z" fill="#090b0d" stroke="#9b7a4b" stroke-width="4"/>
+<path d="M1144 275 L1206 188 1268 275 Z" fill="#090b0d" stroke="#846b46" stroke-width="4"/>
+<path d="M1280 205 L1340 120 1402 205 Z" fill="#090b0d" stroke="#846b46" stroke-width="4"/>
+<!-- tower buttresses / walls -->
+<path d="M522 620 H1380 M565 360 H1364" stroke="#6e624d" stroke-width="4" opacity=".75"/>
+<path d="M648 355 V620 M785 275 V620 M900 318 V620 M1098 210 V620 M1207 318 V620 M1362 250 V620" stroke="#5c564c" stroke-width="5" opacity=".75"/>
+<!-- windows -->
+<g fill="url(#warm)" filter="url(#glow)">
+ <path d="M607 398 L620 385 633 398 V438 H607 Z"/><path d="M742 315 L756 302 770 315 V361 H742 Z"/><path d="M949 282 L964 268 979 282 V331 H949 Z"/>
+ <path d="M1117 333 L1130 320 1143 333 V375 H1117 Z"/><path d="M1240 372 L1253 359 1266 372 V414 H1240 Z"/><path d="M1319 303 L1331 291 1343 303 V346 H1319 Z"/>
+</g>
+<!-- central gate -->
+<path d="M884 620 V495 C884 435 928 402 973 402 C1018 402 1062 435 1062 495 V620" fill="#07090a" stroke="#8a6b43" stroke-width="5"/>
+<path d="M973 438 V620 M933 475 H1013" stroke="#514a40" stroke-width="5" opacity=".65"/>
+<!-- foreground wall -->
+<path d="M0 620 C280 570 430 612 560 600 C710 585 820 630 930 612 C1060 592 1190 570 1320 602 C1480 640 1640 590 1800 620 V900 H0 Z" fill="#0a0c0d"/>
+<path d="M0 664 C260 620 420 660 580 645 C720 632 825 675 950 652 C1100 626 1215 615 1360 652 C1510 686 1650 632 1800 658" stroke="#413a31" stroke-width="4" opacity=".7"/>
+<!-- fog -->
+<path d="M0 720 C160 660 280 760 445 708 C610 657 725 748 890 700 C1070 648 1200 740 1360 688 C1535 634 1650 730 1800 680" stroke="#6f6d68" stroke-opacity=".08" stroke-width="58"/>
+<rect width="1800" height="900" filter="url(#noise)"/>
+</svg>

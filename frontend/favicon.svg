@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 760" fill="none">
+<defs>
+  <linearGradient id="bronze" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#60451e"/><stop offset=".45" stop-color="#d2a75e"/><stop offset=".72" stop-color="#f0cf93"/><stop offset="1" stop-color="#6f4d22"/></linearGradient>
+  <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#2e3030"/><stop offset=".45" stop-color="#8c8879"/><stop offset=".68" stop-color="#d0c2a2"/><stop offset="1" stop-color="#262625"/></linearGradient>
+  <filter id="glow"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="shadow"><feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#000" flood-opacity=".78"/></filter>
+  <pattern id="grain" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="4" cy="6" r="1" fill="#fff" opacity=".04"/><circle cx="17" cy="19" r="1" fill="#000" opacity=".05"/></pattern>
+</defs>
+<g filter="url(#shadow)">
+  <path d="M300 34L448 86L430 302C420 432 362 558 300 636C238 558 180 432 170 302L152 86L300 34Z" fill="#0b0d0d" stroke="url(#bronze)" stroke-width="12"/>
+  <path d="M300 65L417 106L402 298C394 404 350 512 300 580C250 512 206 404 198 298L183 106L300 65Z" fill="#121415" stroke="#6f572c" stroke-width="3"/>
+  <path d="M224 326C178 294 146 241 146 174C188 191 221 217 245 253" stroke="url(#bronze)" stroke-width="15" stroke-linecap="round"/>
+  <path d="M376 326C422 294 454 241 454 174C412 191 379 217 355 253" stroke="url(#bronze)" stroke-width="15" stroke-linecap="round"/>
+  <path d="M300 130V465" stroke="url(#steel)" stroke-width="18"/>
+  <path d="M265 176L300 105L335 176" stroke="url(#bronze)" stroke-width="11" stroke-linejoin="round"/>
+  <path d="M238 220L362 220" stroke="url(#bronze)" stroke-width="11" stroke-linecap="round"/>
+  <path d="M270 468L300 512L330 468" stroke="url(#bronze)" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M300 152L246 260L300 344L354 260L300 152Z" fill="#090b0c" stroke="url(#bronze)" stroke-width="7"/>
+  <path d="M300 178L266 252L300 303L334 252L300 178Z" stroke="#cba05b" stroke-width="4" opacity=".75"/>
+  <circle cx="300" cy="266" r="13" fill="#e7c77f" filter="url(#glow)"/>
+  <path d="M205 124L225 102M395 124L375 102M212 590L240 566M388 590L360 566" stroke="#e0b66a" stroke-width="5" stroke-linecap="round" opacity=".75"/>
+  <path d="M169 118L139 88M431 118L461 88" stroke="#72572a" stroke-width="6" stroke-linecap="round"/>
+  <path d="M171 500L120 555M429 500L480 555" stroke="#6c5024" stroke-width="7" stroke-linecap="round"/>
+  <path d="M300 62L300 24M285 40L315 40" stroke="#dfb66a" stroke-width="5" stroke-linecap="round"/>
+</g>
+<path d="M152 86L170 302C180 432 238 558 300 636C362 558 420 432 430 302L448 86L300 34Z" fill="url(#grain)" opacity=".5"/>
+</svg>

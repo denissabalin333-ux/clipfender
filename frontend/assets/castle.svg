@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720">
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#071014"/><stop offset=".60" stop-color="#16191b"/><stop offset="1" stop-color="#050607"/></linearGradient>
+ <radialGradient id="moon"><stop stop-color="#f1e1b9" stop-opacity=".92"/><stop offset="1" stop-color="#a98a55" stop-opacity="0"/></radialGradient>
+ <linearGradient id="stone" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#63584b"/><stop offset="1" stop-color="#171717"/></linearGradient>
+ <filter id="fog"><feGaussianBlur stdDeviation="24"/></filter>
+ <filter id="shadow"><feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#000" flood-opacity=".8"/></filter>
+</defs>
+<rect width="1200" height="720" fill="url(#bg)"/>
+<circle cx="855" cy="145" r="125" fill="url(#moon)"/>
+<g opacity=".22" filter="url(#fog)" fill="#a99986"><path d="M0 498 Q200 420 420 500 T860 488 T1200 450V620H0Z"/><path d="M120 560 Q380 470 650 560 T1200 520V640H120Z"/></g>
+<!-- distant towers -->
+<g fill="#151719" stroke="#433b32" stroke-width="5">
+<path d="M80 540V310L118 278L156 310V540Z"/><path d="M170 540V255L208 218L246 255V540Z"/>
+<path d="M300 540V205L340 164L380 205V540Z"/><path d="M810 540V225L850 182L890 225V540Z"/><path d="M925 540V290L960 250L995 290V540Z"/><path d="M1030 540V330L1062 294L1094 330V540Z"/>
+</g>
+<!-- central keep -->
+<g fill="url(#stone)" stroke="#78654e" stroke-width="5" filter="url(#shadow)">
+<path d="M395 540V285L445 240L495 285V540Z"/>
+<path d="M470 540V175L520 128L570 175V540Z"/>
+<path d="M550 540V225L600 175L650 225V540Z"/>
+<path d="M630 540V185L680 138L730 185V540Z"/>
+<path d="M705 540V275L755 232L805 275V540Z"/>
+</g>
+<!-- roof caps -->
+<g fill="#100f0f" stroke="#9a7b4e" stroke-width="4"><path d="M430 243 L445 196 L460 243Z"/><path d="M505 127 L520 75 L535 127Z"/><path d="M585 174 L600 120 L615 174Z"/><path d="M665 136 L680 86 L695 136Z"/><path d="M740 233 L755 185 L770 233Z"/></g>
+<!-- lit windows -->
+<g fill="#d6ad63" opacity=".82"><rect x="510" y="230" width="15" height="34"/><rect x="595" y="255" width="15" height="34"/><rect x="675" y="210" width="15" height="34"/><rect x="445" y="335" width="14" height="30"/><rect x="745" y="340" width="14" height="30"/></g>
+<!-- moat / foreground -->
+<path d="M0 555 Q220 505 410 558 T820 550 T1200 520V720H0Z" fill="#070a0c"/>
+<path d="M0 612 Q250 554 470 616 T900 602 T1200 580" fill="none" stroke="#a99068" stroke-opacity=".18" stroke-width="5"/>
+</svg>

@@ -1,0 +1,113 @@
+/* ClipFender Stage 14 — portrait reliability and clarity. */
+.cf14-portrait-shell,
+.cf10-character-art {
+  position: relative;
+  isolation: isolate;
+}
+
+.cf14-portrait-shell .cf12-character-portrait img,
+.cf10-character-art img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  image-rendering: auto;
+  filter: none !important;
+  backdrop-filter: none !important;
+  opacity: 1;
+  background: #0a0e10;
+}
+
+.cf14-portrait-shell .cf12-character-portrait-shade {
+  z-index: 2;
+  background: linear-gradient(
+    180deg,
+    rgba(3,5,6,.02) 18%,
+    transparent 50%,
+    rgba(2,3,4,.62) 100%
+  );
+}
+
+.cf14-portrait-status {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  text-align: center;
+  color: #cfc2a9;
+  background: linear-gradient(180deg, rgba(6,8,10,.78), rgba(6,8,10,.92));
+  font: 600 9px/1.55 'Montserrat', sans-serif;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.cf14-portrait-status[hidden] {
+  display: none !important;
+}
+
+.cf14-portrait-status.is-error {
+  color: #d9b88a;
+  background: linear-gradient(180deg, rgba(8,9,10,.94), rgba(11,10,9,.98));
+}
+
+.cf14-portrait-status__inner {
+  max-width: 240px;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+}
+
+.cf14-portrait-status__mark {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(224,182,106,.34);
+  border-radius: 0;
+  color: #d7b36e;
+  font: 600 16px/1 'Cinzel', serif;
+}
+
+.cf14-portrait-status__text {
+  color: inherit;
+}
+
+.cf14-portrait-shell.is-loading::after,
+.cf10-character-art.is-loading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(110deg, transparent 18%, rgba(224,184,106,.06) 45%, transparent 72%);
+  transform: translateX(-110%);
+  animation: cf14-portrait-shimmer 1.15s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.cf14-portrait-shell.is-ready::after,
+.cf10-character-art.is-ready::after {
+  display: none;
+}
+
+.cf10-character-art::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(3,5,6,.02), transparent 48%, rgba(2,3,4,.38) 100%);
+}
+
+@keyframes cf14-portrait-shimmer {
+  to { transform: translateX(110%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cf14-portrait-shell.is-loading::after,
+  .cf10-character-art.is-loading::after {
+    animation: none;
+    opacity: .18;
+  }
+}

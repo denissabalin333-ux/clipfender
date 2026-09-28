@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ru" data-cf-final="1">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/app.css?v=100.0">
+  {% include "components/seo.html" %}
+</head>
+<body class="search-page cf8-page">
+{% include "components/header.html" %}
+<main class="cf8-search-page" data-cf-search-scenery="1">
+  <div class="cf8-shell">
+    <div class="cf8-mode-switch" role="tablist" aria-label="Режим поиска">
+      <a href="/search?mode=search" data-cf-mode="search">ОБЫЧНЫЙ ПОИСК</a>
+      <a href="/search?mode=idea" data-cf-mode="idea">✦ ИДЕЯ ДЛЯ ЭДИТА</a>
+      <a href="/archive" data-cf-hard-nav>АРХИВ</a>
+    </div>
+
+    <section class="cf8-hero">
+      <div class="cf8-panel cf8-panel--intro">
+        <span class="cf8-kicker">ПОЛНОЭКРАННЫЙ ПОИСК · STAGE 10</span>
+        <h1 class="cf8-title" id="cf8Title">Найди материал. Или собери сценарий.</h1>
+        <p class="cf8-lead" id="cf8Lead">Обычный режим показывает реальные материалы из ClipFender. Режим «Идея для эдита» сначала собирает монтажный сценарий, а затем автоматически ищет реальные материалы под его параметры.</p>
+        <form id="cf8SearchForm" class="cf8-form">
+          <input id="cf8Query" type="search" maxlength="120" placeholder="Персонаж, сцена или ключевая фраза" autocomplete="off" aria-label="Запрос">
+          <button type="submit">НАЙТИ</button>
+        </form>
+        <div class="cf8-tags" aria-label="Готовые запросы">
+          <button type="button" data-query="Джейми Ланнистер">ДЖЕЙМИ ЛАННИСТЕР</button>
+          <button type="button" data-query="Джон Сноу">ДЖОН СНОУ</button>
+          <button type="button" data-query="Битва">БИТВА</button>
+          <button type="button" data-query="Cinematic">CINEMATIC</button>
+        </div>
+      </div>
+
+      <aside class="cf8-panel cf8-panel--controls">
+        <div class="cf8-controls-grid">
+          <div class="cf8-field cf8-field--wide">
+            <label for="cf8Film">Фильм / сериал</label>
+            <input id="cf8Film" type="text" maxlength="120" placeholder="Например: Game of Thrones">
+          </div>
+          <div class="cf8-field cf8-idea-only">
+            <label for="cf8Character">Персонаж</label>
+            <input id="cf8Character" type="text" maxlength="120" list="cf8CharacterList" placeholder="Например: Джон Сноу" autocomplete="off">
+            <datalist id="cf8CharacterList">
+              <option value="Джон Сноу"></option>
+              <option value="Джейми Ланнистер"></option>
+              <option value="Дейенерис Таргариен"></option>
+              <option value="Тирион Ланнистер"></option>
+              <option value="Арья Старк"></option>
+              <option value="Серсея Ланнистер"></option>
+              <option value="Барристан Селми"></option>
+            </datalist>
+          </div>
+          <div class="cf8-field cf8-idea-only">
+            <label for="cf8Genre">Жанр</label>
+            <select id="cf8Genre">
+              <option value="">Любой</option>
+              <option value="action">Экшн</option>
+              <option value="drama">Драма</option>
+              <option value="romance">Романтика</option>
+              <option value="horror_tragedy">Хоррор / трагедия</option>
+              <option value="comedy">Комедия</option>
+              <option value="adventure">Приключения</option>
+            </select>
+          </div>
+          <div class="cf8-field cf8-idea-only">
+            <label for="cf8Mood">Настроение</label>
+            <select id="cf8Mood">
+              <option value="">Любое</option>
+              <option value="action">Экшн</option>
+              <option value="dark">Тёмное</option>
+              <option value="drama">Драма</option>
+              <option value="romance">Романтика</option>
+              <option value="emotional">Эмоциональное</option>
+              <option value="epic">Эпичное</option>
+              <option value="tension">Напряжение</option>
+              <option value="melancholy">Меланхолия</option>
+            </select>
+          </div>
+          <div class="cf8-field cf8-idea-only">
+            <label for="cf8Tempo">Темп</label>
+            <select id="cf8Tempo">
+              <option value="">Любой</option>
+              <option value="fast">Быстрые кадры</option>
+              <option value="medium">Средний темп</option>
+              <option value="slow">Медленный монтаж</option>
+            </select>
+          </div>
+          <div class="cf8-field">
+            <label for="cf8Limit">Материалов на этап</label>
+            <select id="cf8Limit">
+              <option value="2">2</option>
+              <option value="3" selected>3</option>
+              <option value="4">4</option>
+            </select>
+          </div>
+        </div>
+        <div class="cf8-idea-actions cf8-idea-only"><button type="button" class="cf8-secondary-button" id="cf8RandomIdea">✦ СЛУЧАЙНАЯ ИДЕЯ</button><span>Сценарий и материалы строятся на реальных параметрах и данных ClipFender — без выдуманных роликов.</span></div><p class="cf8-note">Жанр, персонаж, фильм, настроение и темп передаются отдельно. При пустом/устаревшем кэше Idea Mode автоматически запускает тот же живой YouTube-поиск, использующийся обычным поиском.</p>
+      </aside>
+    </section>
+
+    <div id="cf8Status" class="cf8-status" role="status" aria-live="polite">Введите запрос.</div>
+    <section id="cf8Results" class="cf8-results"></section>
+  </div>
+</main>
+{% include "components/footer.html" %}
+<script src="/static/js/site.js?v=7.5"></script>
+<script src="/static/js/final-v6.js?v=60.0"></script>
+<script src="/static/js/final-v7.js?v=70.0"></script>
+<script src="/static/js/stage8-idea.js?v=101.0"></script>
+<script src="/static/js/stage16-character-autodiscovery.js?v=160.0"></script>
+</body>
+</html>

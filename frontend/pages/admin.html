@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ru" data-cf-final="1" data-page="admin">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  {% include "components/seo.html" %}
+  <link rel="stylesheet" href="/static/css/stage11-admin.css?v=110.0">
+</head>
+<body class="page admin-page">
+  {% include "components/header.html" %}
+  <main id="main-content" class="admin-shell">
+    <section class="admin-hero">
+      <span class="panel-kicker" data-i18n="admin.kicker">ОПЕРАЦИОННЫЙ ЗАЛ</span>
+      <h1 data-i18n="admin.title">АДМИН-ПАНЕЛЬ</h1>
+      <p data-i18n="admin.description">Сводка сервиса, квота YouTube и очередь жалоб.</p>
+    </section>
+    <div class="admin-status" data-admin-status role="status" aria-live="polite"></div>
+    <section class="admin-grid" data-admin-dashboard hidden>
+      <article class="admin-card"><span data-i18n="admin.users">ПОЛЬЗОВАТЕЛИ</span><strong data-stat="users">—</strong></article>
+      <article class="admin-card"><span data-i18n="admin.videos">ВИДЕО В БД</span><strong data-stat="videos">—</strong></article>
+      <article class="admin-card"><span data-i18n="admin.searches">ПОИСКОВ ЗА 24 Ч</span><strong data-stat="searches_24h">—</strong></article>
+      <article class="admin-card"><span data-i18n="admin.openReports">ОТКРЫТЫХ ЖАЛОБ</span><strong data-stat="open_reports">—</strong></article>
+      <article class="admin-card"><span data-i18n="admin.contacts">НОВЫХ ОБРАЩЕНИЙ</span><strong data-stat="new_contacts">—</strong></article>
+      <article class="admin-card"><span data-i18n="admin.quota">КВОТА</span><strong data-stat="quota">—</strong><small data-stat="quotaRemaining">—</small></article>
+    </section>
+    <section class="admin-panel" data-admin-dashboard hidden>
+      <div class="admin-panel__head"><div><span class="panel-kicker" data-i18n="admin.topQueries">ТОП ЗАПРОСОВ</span><h2 data-i18n="admin.last7">Последние 7 дней</h2></div><button class="btn btn-secondary" type="button" data-admin-refresh data-i18n="admin.refresh">ОБНОВИТЬ</button></div>
+      <ol class="admin-top-queries" data-admin-top-queries></ol>
+    </section>
+    <section class="admin-panel" data-admin-dashboard hidden>
+      <div class="admin-panel__head"><div><span class="panel-kicker" data-i18n="admin.reports">ЖАЛОБЫ</span><h2 data-i18n="admin.reportQueue">Очередь материалов</h2></div><div class="admin-filter"><select data-admin-report-status><option value="open">Открытые</option><option value="resolved">Решённые</option><option value="all">Все</option></select></div></div>
+      <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>ID</th><th>Видео</th><th>Причина</th><th>Описание</th><th>Пользователь</th><th>Дата</th><th>Статус</th><th>Действие</th></tr></thead><tbody data-admin-reports></tbody></table></div>
+    </section>
+  </main>
+  {% include "components/footer.html" %}
+  <script src="/static/js/site.js?v=7.5"></script>
+  <script src="/static/js/stage11-admin.js?v=110.0" defer></script>
+</body>
+</html>

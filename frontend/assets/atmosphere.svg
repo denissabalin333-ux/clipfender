@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+<defs>
+ <filter id="fog"><feGaussianBlur stdDeviation="34"/></filter>
+ <radialGradient id="mist"><stop stop-color="#d2c1a2" stop-opacity=".22"/><stop offset="1" stop-color="#d2c1a2" stop-opacity="0"/></radialGradient>
+ <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency=".55" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="table" tableValues="0 .065"/></feComponentTransfer></filter>
+</defs>
+<ellipse cx="340" cy="680" rx="420" ry="120" fill="url(#mist)" filter="url(#fog)"/>
+<ellipse cx="1180" cy="640" rx="470" ry="130" fill="url(#mist)" filter="url(#fog)"/>
+<path d="M0 590 Q300 520 560 600T1100 584T1600 548V820H0Z" fill="#d4c6aa" opacity=".06" filter="url(#fog)"/>
+<rect width="1600" height="900" filter="url(#noise)" opacity=".28"/>
+</svg>

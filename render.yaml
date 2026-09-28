@@ -1,0 +1,66 @@
+services:
+  - type: web
+    name: clipfinder
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    disk:
+      name: clipfender-data
+      mountPath: /var/lib/clipfender
+      sizeGB: 1
+    envVars:
+      - key: YOUTUBE_API_KEY
+        sync: false
+      - key: APP_ENV
+        value: production
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: ADMIN_EMAILS
+        sync: false
+      - key: ADMIN_BOOTSTRAP_PASSWORD
+        sync: false
+      - key: ADMIN_BOOTSTRAP_NAME
+        value: ClipFender Admin
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: CHARACTER_IMAGE_SEARCH_ENABLED
+        value: '0'
+      - key: CHARACTER_IMAGE_GENERATION_ENABLED
+        value: '1'
+      - key: OPENAI_IMAGE_MODEL
+        value: gpt-image-2
+      - key: OPENAI_IMAGE_SIZE
+        value: 1024x1536
+      - key: CHARACTER_STORAGE_DIR
+        value: /var/lib/clipfender/characters
+      - key: CHARACTER_IMAGE_MIN_SHORT_SIDE
+        value: '900'
+      - key: CHARACTER_IMAGE_MAX_BYTES
+        value: '12000000'
+      - key: CHARACTER_IMAGE_MIN_EDGE_SCORE
+        value: '7'
+      - key: CHARACTER_DISCOVERY_RATE_LIMIT
+        value: '3'
+      - key: CHARACTER_DISCOVERY_RATE_WINDOW
+        value: '86400'
+      - key: CHARACTER_GENERATION_DAILY_GUARD
+        value: '10'
+      - key: TRUST_PROXY_HEADERS
+        value: '1'
+      - key: CLIPFINDER_DB_PATH
+        value: /var/lib/clipfender/clipfinder.db
+      - key: PLAUSIBLE_DOMAIN
+        sync: false
+      - key: PLAUSIBLE_SCRIPT_URL
+        value: https://plausible.io/js/script.js
+      - key: SEARCH_DAILY_GUARD
+        value: '70'
+      - key: SEARCH_REQUEST_MIN_INTERVAL
+        value: '0.35'
+      - key: SEARCH_RATE_LIMIT
+        value: '30'
+      - key: SEARCH_RATE_WINDOW
+        value: '60'

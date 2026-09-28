@@ -1,0 +1,107 @@
+/*
+ * ClipFender — unified stylesheet entry point.
+ * Legacy application styles are retained in their original cascade order.
+ * The new foundation is applied after legacy rules so the stacking contract
+ * can take effect without rewriting or deleting the historical styles.
+ */
+@import url("./design-tokens.css");
+@import url("./site.css");
+@import url("./final-v6.css");
+@import url("./final-v7.css");
+@import url("./base.css");
+@import url("./components.css");
+@import url("./pages/index.css");
+@import url("./pages/archive.css");
+@import url("./pages/character-search.css");
+@import url("./pages/guides.css");
+@import url("./pages/edit-ideas.css");
+@import url("./pages/video.css");
+@import url("./pages/portfolio.css");
+@import url("./pages/services.css");
+@import url("./pages/about.css");
+@import url("./pages/contacts.css");
+@import url("./pages/characters.css");
+@import url("./pages/help.css");
+@import url("./pages/faq.css");
+@import url("./pages/project.css");
+@import url("./pages/login.css");
+@import url("./pages/404.css");
+
+@import url("./stage2-layout.css");
+
+@import url("/static/css/stage3-actions.css");
+
+@import url("./stage5-atmosphere.css");
+
+@import url("./pages/library.css");
+@import url("./stage7-publish.css");
+
+@import url("./stage8-idea.css");
+
+
+/* Stage 11 language and report controls */
+.cf-i18n-toggle{border:1px solid rgba(200,155,60,.38);background:rgba(12,13,14,.72);color:#e0b86a;border-radius:999px;padding:6px 9px;font:600 10px/1 Montserrat,system-ui,sans-serif;letter-spacing:.08em;cursor:pointer} .cf-i18n-toggle:hover,.cf-i18n-toggle:focus-visible{box-shadow:0 0 0 3px rgba(200,155,60,.12),0 0 18px rgba(200,155,60,.18)} .cf-report-panel{margin-top:18px;padding-top:16px;border-top:1px solid rgba(200,155,60,.18)} .cf-report-panel form{display:grid;gap:12px;margin-top:12px}.cf-report-panel label{display:grid;gap:6px;color:#a79e8c;font-size:12px}.cf-report-panel select,.cf-report-panel textarea{width:100%;background:#0c0e0f;color:#ddd4c2;border:1px solid rgba(200,155,60,.26);padding:10px}.cf-report-actions{display:flex;gap:10px;flex-wrap:wrap}.cf-report-panel [data-cf-report-status]{min-height:20px;color:#c9b787}
+
+@import url("./stage9-release-polish.css");
+@import url("./stage13-release.css");
+@import url("./stage15-release.css");
+
+/* ============================================================
+   CLIPFENDER STAGE 12 — DATA-DRIVEN CHARACTER CATALOG
+   Shared application stylesheet. No inline page-specific CSS.
+   ============================================================ */
+.cf12-characters-page{padding-top:116px}
+.cf12-characters-intro{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:end;margin-bottom:26px}
+.cf12-characters-intro .cf-v7-lead{max-width:840px}
+.cf12-characters-count{min-width:165px;padding:18px 20px;border:1px solid rgba(200,155,60,.26);background:rgba(8,12,14,.78);text-align:center;box-shadow:0 20px 45px rgba(0,0,0,.28)}
+.cf12-characters-count strong{display:block;font:600 38px/1 'Cinzel',serif;color:#e1bd76}
+.cf12-characters-count span{display:block;margin-top:7px;color:#887c6b;font:600 8px/1.5 'Montserrat',sans-serif;letter-spacing:.14em}
+.cf12-characters-controls{display:grid;grid-template-columns:minmax(250px,1.25fr) minmax(190px,.75fr) minmax(190px,.75fr) auto;gap:10px;padding:14px 16px;margin-bottom:14px;overflow:visible}
+.cf12-control{min-width:0}
+.cf12-control label{display:block;margin:0 0 6px;color:#8d8377;font:600 8px/1 'Montserrat',sans-serif;letter-spacing:.14em;text-transform:uppercase}
+.cf12-control input,.cf12-control select{width:100%;height:42px;border:1px solid rgba(200,155,60,.23);background:#080d10;color:#e8dcc5;padding:0 11px;outline:none;font:500 10px 'Montserrat',sans-serif}
+.cf12-control input:focus,.cf12-control select:focus{border-color:rgba(224,182,106,.65);box-shadow:0 0 0 2px rgba(200,155,60,.08)}
+.cf12-characters-controls .cf-v7-btn{align-self:end;min-height:42px}
+.cf12-results-bar{display:flex;justify-content:space-between;gap:12px;margin:10px 0 13px;color:#7f766a;font:600 8px 'Montserrat',sans-serif;letter-spacing:.13em;text-transform:uppercase}
+.cf12-results-bar span:first-child{color:#bea06b}
+.cf12-character-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.cf12-character-card{position:relative;min-width:0;border:1px solid rgba(200,155,60,.25);background:linear-gradient(180deg,#0e1518,#070a0c);box-shadow:0 22px 58px rgba(0,0,0,.43);overflow:hidden;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}
+.cf12-character-card:hover{transform:translateY(-5px);border-color:rgba(224,182,106,.58);box-shadow:0 28px 70px rgba(0,0,0,.55),0 0 20px rgba(200,155,60,.08)}
+.cf12-character-card[hidden]{display:none!important}
+.cf12-character-portrait{position:relative;height:350px;overflow:hidden;background:#0a0e10}
+.cf12-character-portrait img{width:100%;height:100%;display:block;object-fit:cover;object-position:center top;filter:none!important;transition:transform .45s ease}
+.cf12-character-card:hover .cf12-character-portrait img{transform:scale(1.025)}
+.cf12-character-portrait-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,5,6,.05) 22%,transparent 44%,rgba(2,3,4,.88) 100%);pointer-events:none}
+.cf12-character-house{position:absolute;left:18px;top:18px;right:18px;z-index:2;color:#d3b475;font:600 8px/1.4 'Montserrat',sans-serif;letter-spacing:.16em;text-transform:uppercase;text-shadow:0 2px 8px #000}
+.cf12-character-name{position:absolute;left:18px;right:18px;bottom:18px;z-index:2;color:#f0dfbe;font:600 clamp(21px,2vw,28px)/1.05 'Cinzel',serif;text-shadow:0 4px 24px #000}
+.cf12-character-body{padding:19px 19px 21px}
+.cf12-character-body .cf-v7-kicker{margin-bottom:9px;font-size:8px;letter-spacing:.16em;color:#9d8557;white-space:normal}
+.cf12-character-body p{min-height:82px;margin:0 0 16px;color:#989087;font-size:10px;line-height:1.7}
+.cf12-character-actions{display:flex;flex-wrap:wrap;gap:7px}
+.cf12-character-actions .cf-v7-btn{min-height:38px;padding:0 12px;font-size:8px}
+.cf12-favorite-button.is-active{color:#f0c877;border-color:rgba(224,182,106,.68);background:linear-gradient(180deg,#3f2d12,#1a1208);box-shadow:0 0 18px rgba(200,155,60,.10)}
+.cf12-characters-empty{margin-top:18px;padding:34px 28px;text-align:center;background:rgba(8,12,14,.82)}
+.cf12-characters-empty h2{margin:8px 0;font:500 28px 'Cinzel',serif;color:#ead6ad}
+.cf12-characters-empty p{max-width:700px;margin:0 auto 18px;color:#928a7f;font-size:11px;line-height:1.7}
+
+@media(max-width:1050px){
+  .cf12-character-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cf12-characters-controls{grid-template-columns:1fr 1fr 1fr auto}
+  .cf12-character-portrait{height:320px}
+}
+@media(max-width:760px){
+  .cf12-characters-page{padding-top:96px}
+  .cf12-characters-intro{grid-template-columns:1fr;align-items:start}
+  .cf12-characters-count{min-width:0;width:100%;display:flex;align-items:center;justify-content:center;gap:12px;text-align:left}
+  .cf12-characters-count strong{font-size:30px}
+  .cf12-characters-controls{grid-template-columns:1fr 1fr;gap:10px}
+  .cf12-characters-controls .cf-v7-btn{width:100%}
+  .cf12-results-bar{align-items:flex-start;flex-direction:column}
+  .cf12-character-grid{grid-template-columns:1fr}
+  .cf12-character-portrait{height:360px}
+}
+@media(max-width:480px){
+  .cf12-characters-controls{grid-template-columns:1fr}
+  .cf12-character-portrait{height:340px}
+  .cf12-character-actions .cf-v7-btn{width:100%}
+}

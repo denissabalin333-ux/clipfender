@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 900" preserveAspectRatio="xMidYMid slice">
+<defs>
+ <linearGradient id="base" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#040608"/><stop offset=".58" stop-color="#0a1013"/><stop offset="1" stop-color="#030405"/></linearGradient>
+ <radialGradient id="light"><stop stop-color="#e5c27e" stop-opacity=".34"/><stop offset="1" stop-color="#e5c27e" stop-opacity="0"/></radialGradient>
+ <linearGradient id="shade" x1="0" x2="1"><stop stop-color="#030405" stop-opacity=".12"/><stop offset=".48" stop-color="#030405" stop-opacity=".78"/><stop offset="1" stop-color="#030405" stop-opacity=".12"/></linearGradient>
+ <filter id="blur"><feGaussianBlur stdDeviation="28"/></filter>
+</defs>
+<rect width="1800" height="900" fill="url(#base)"/>
+<image href="/static/assets/reference/cf-castle-panorama.svg" x="0" y="0" width="1800" height="900" preserveAspectRatio="xMidYMid slice" opacity=".80"/>
+<ellipse cx="520" cy="500" rx="430" ry="260" fill="url(#light)" filter="url(#blur)"/>
+<image href="/static/assets/reference/cf-dragon-cutout.svg" x="-120" y="60" width="1060" height="530" preserveAspectRatio="xMidYMid meet" opacity=".93"/>
+<rect width="1800" height="900" fill="url(#shade)"/>
+<rect width="1800" height="900" fill="none" stroke="#c79a58" stroke-opacity=".08"/>
+</svg>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru" data-cf-final="1" data-page="library">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClipFender — Моя библиотека</title>
+  <link rel="stylesheet" href="/static/css/app.css?v=72.0">
+  {% include "components/seo.html" %}
+</head>
+<body data-page="library">
+  {% include "components/header.html" %}
+  <main class="cf-library-page" id="main-content">
+    <section class="cf-library-hero">
+      <div class="cf-library-hero__inner">
+        <div class="cf-library-crest" aria-hidden="true"><img src="/static/assets/reference/cf-crest.svg" alt="" aria-hidden="true" aria-hidden="true"></div>
+        <div>
+          <span class="cf-library-kicker">АРХИВ РЕДАКТОРА</span>
+          <h1>МОЯ БИБЛИОТЕКА</h1>
+          <p>Избранные кадры, монтажные коллекции, история поиска и сохранённые наборы фильтров.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="cf-library-shell">
+      <div id="libraryAuthGate" class="cf-library-state" hidden>
+        <div class="cf-library-state__crest" aria-hidden="true">⚔</div>
+        <h2>БИБЛИОТЕКА ДОСТУПНА ПОСЛЕ ВХОДА</h2>
+        <p>Войди в ClipFender, чтобы синхронизировать избранное между устройствами и сохранять коллекции.</p>
+        <a class="cf-library-btn cf-library-btn--gold" href="/login">ВОЙТИ В АККАУНТ →</a>
+      </div>
+
+      <div id="libraryContent" hidden>
+        <div class="cf-library-toolbar">
+          <div>
+            <span class="cf-library-kicker">ЛИЧНЫЙ АРХИВ</span>
+            <h2>Кадры, которые стоит не потерять</h2>
+          </div>
+          <div class="cf-library-toolbar__actions">
+            <button type="button" class="cf-library-btn" onclick="exportLibrary('csv')">CSV</button>
+            <button type="button" class="cf-library-btn" onclick="exportLibrary('json')">JSON</button>
+            <button type="button" class="cf-library-btn" onclick="exportLibrary('markdown')">Markdown</button>
+          </div>
+        </div>
+
+        <div class="cf-library-grid">
+          <section class="cf-library-panel cf-library-panel--wide">
+            <div class="cf-library-panel__head"><div><span>ИЗБРАННОЕ</span><h3>Материалы</h3></div><strong id="favoriteCount">0</strong></div>
+            <div id="libraryFavorites" class="cf-library-list"></div>
+          </section>
+
+          <section class="cf-library-panel">
+            <div class="cf-library-panel__head"><div><span>КОЛЛЕКЦИИ</span><h3>Монтажные пакеты</h3></div></div>
+            <form id="collectionForm" class="cf-library-form">
+              <input name="name" type="text" maxlength="80" placeholder="Например: Джон — финал сезона" required>
+              <input name="description" type="text" maxlength="200" placeholder="Короткое описание">
+              <button class="cf-library-btn cf-library-btn--gold" type="submit">+ СОЗДАТЬ</button>
+            </form>
+            <div id="libraryCollections" class="cf-library-collections"></div>
+          </section>
+
+          <section class="cf-library-panel">
+            <div class="cf-library-panel__head"><div><span>ПОИСКИ</span><h3>История</h3></div><button class="cf-library-inline" type="button" onclick="clearSearchHistory()">Очистить</button></div>
+            <div id="libraryHistory" class="cf-library-history"></div>
+          </section>
+
+          <section class="cf-library-panel">
+            <div class="cf-library-panel__head"><div><span>ФИЛЬТРЫ</span><h3>Сохранённые наборы</h3></div></div>
+            <div id="librarySavedFilters" class="cf-library-history"></div>
+          </section>
+
+        <section class="cf-library-panel cf-library-panel--danger">
+          <div class="cf-library-panel__head"><div><span>ДАННЫЕ АККАУНТА</span><h3>Удаление данных</h3></div></div>
+          <p class="cf-library-danger-copy">Удаление аккаунта необратимо: будут удалены сессии, избранное, коллекции, история поиска и сохранённые фильтры.</p>
+          <form id="deleteAccountForm" class="cf-library-form">
+            <input id="deleteAccountPassword" name="password" type="password" autocomplete="current-password" placeholder="Текущий пароль" required>
+            <button class="cf-library-btn cf-library-btn--danger" type="submit">УДАЛИТЬ АККАУНТ</button>
+          </form>
+          <p id="deleteAccountStatus" class="cf-library-status" role="status" aria-live="polite"></p>
+        </section>
+        </div>
+      </div>
+    </section>
+  </main>
+  {% include "components/footer.html" %}
+  <script src="/static/js/site.js?v=7.6"></script>
+  <script src="/static/js/final-v6.js?v=61.0"></script>
+  <script src="/static/js/final-v7.js?v=71.0"></script>
+  <script src="/static/js/stage6-library.js?v=90.0"></script>
+  <script src="/static/js/stage7-account.js?v=1.0"></script>
+</body>
+</html>

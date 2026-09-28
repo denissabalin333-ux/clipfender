@@ -1,0 +1,24 @@
+<meta name="description" content="{{ page_meta.description }}">
+<meta name="robots" content="{{ page_meta.robots | default('index,follow,max-image-preview:large') }}">
+<link rel="canonical" href="{{ canonical_url }}">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="alternate icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#070b0e">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="CLIPFENDER">
+<meta property="og:title" content="{{ page_meta.title }}">
+<meta property="og:description" content="{{ page_meta.description }}">
+<meta property="og:url" content="{{ canonical_url }}">
+<meta property="og:image" content="{{ og_image }}">
+<meta property="og:locale" content="ru_RU">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ page_meta.title }}">
+<meta name="twitter:description" content="{{ page_meta.description }}">
+<meta name="twitter:image" content="{{ og_image }}">
+<meta name="cf-analytics-enabled" content="{{ '1' if analytics_enabled else '0' }}">
+<meta name="cf-plausible-domain" content="{{ plausible_domain }}">
+<meta name="cf-plausible-script" content="{{ plausible_script_url }}">
+<script type="application/ld+json">{{ seo_json | safe }}</script>

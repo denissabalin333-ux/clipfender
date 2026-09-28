@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ru" data-cf-final="1">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{{ page_meta.title }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/app.css?v=141.0">
+  <link rel="stylesheet" href="/static/css/stage14-portraits.css?v=141.1">
+  {% include "components/seo.html" %}
+</head>
+<body class="realm-page characters-page">
+  <div class="site-noise" aria-hidden="true"></div>
+  {% include "components/header.html" %}
+
+  <main class="cf-v7-page cf-characters-v7 cf12-characters-page">
+    <div class="cf-v7-shell">
+      <header class="cf12-characters-intro">
+        <div>
+          <span class="cf-v7-kicker">ХРОНИКИ / ПЕРСОНАЖИ</span>
+          <h1 class="cf-v7-title">Герои, из которых рождаются истории</h1>
+          <p class="cf-v7-lead">
+            Реальный каталог персонажей ClipFender. Открывай профиль, смотри монтажный язык и переходи прямо к поиску сцен — без декоративных заглушек и выдуманных карточек.
+          </p>
+        </div>
+        <div class="cf12-characters-count" aria-label="Количество персонажей">
+          <strong>{{ characters|length }}</strong>
+          <span>ПЕРСОНАЖЕЙ<br>В КАТАЛОГЕ</span>
+        </div>
+      </header>
+
+      <section class="cf-v7-frame cf12-characters-controls" aria-label="Фильтры каталога персонажей">
+        <div class="cf12-control">
+          <label for="cf12CharacterSearch">Поиск</label>
+          <input id="cf12CharacterSearch" type="search" placeholder="Имя персонажа…" autocomplete="off">
+        </div>
+        <div class="cf12-control">
+          <label for="cf12HouseFilter">Дом / принадлежность</label>
+          <select id="cf12HouseFilter">
+            <option value="">Все дома</option>
+            {% for house in character_houses %}
+            <option value="{{ house|lower }}">{{ house }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="cf12-control">
+          <label for="cf12ProfileFilter">Edit profile</label>
+          <select id="cf12ProfileFilter">
+            <option value="">Все профили</option>
+            {% for profile in character_edit_profiles %}
+            <option value="{{ profile|lower }}">{{ profile }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button id="cf12ResetFilters" class="cf-v7-btn cf-v7-btn--ghost" type="button">СБРОСИТЬ</button>
+      </section>
+
+      <div class="cf12-results-bar" aria-live="polite">
+        <span id="cf12CharacterMeta">Показано: {{ characters|length }}</span>
+        <span>ФИЛЬТРЫ РАБОТАЮТ ПО РЕАЛЬНЫМ ПРОФИЛЯМ</span>
+      </div>
+
+      <section id="characterCatalog" class="cf12-character-grid" aria-label="Каталог персонажей">
+        {% for character in characters %}
+        <article
+          class="cf12-character-card"
+          data-character-name="{{ character.name|lower }}"
+          data-character-house="{{ character.house.split(' · ')[0]|lower }}"
+          data-character-profiles="{{ character.edit_profile|join(' ')|lower }}"
+        >
+          <div class="cf12-character-portrait cf14-portrait-shell">
+            <img
+              src="{{ character.image }}?v=1520"
+              data-portrait-source="{{ character.image }}?v=1520"
+              data-character-image="{{ character.slug }}"
+              alt="{{ character.name }}"
+              loading="eager"
+              decoding="async"
+              {% if loop.index <= 3 %}fetchpriority="high"{% endif %}
+            >
+            <div class="cf14-portrait-status" hidden aria-live="polite">
+              <div class="cf14-portrait-status__inner">
+                <span class="cf14-portrait-status__mark" aria-hidden="true">✦</span>
+                <span class="cf14-portrait-status__text">ЗАГРУЗКА ПОРТРЕТА</span>
+              </div>
+            </div>
+            <div class="cf12-character-portrait-shade"></div>
+            <span class="cf12-character-house">{{ character.house }}</span>
+            <span class="cf12-character-name">{{ character.name }}</span>
+          </div>
+          <div class="cf12-character-body">
+            <span class="cf-v7-kicker">{{ character.edit_profile|join(' · ') }}</span>
+            <p>{{ character.summary }}</p>
+            <div class="cf12-character-actions">
+              <a class="cf-v7-btn cf-v7-btn--gold" href="/characters/{{ character.slug }}">ПРОФИЛЬ</a>
+              <a class="cf-v7-btn cf-v7-btn--ghost" href="/search?mode=search&amp;q={{ character.query|urlencode }}">НАЙТИ СЦЕНЫ</a>
+              <button
+                class="cf-v7-btn cf-v7-btn--ghost cf12-favorite-button"
+                type="button"
+                data-character-favorite="{{ character.slug }}"
+                data-character-name="{{ character.name }}"
+                aria-pressed="false"
+              >☆ СОХРАНИТЬ</button>
+            </div>
+          </div>
+        </article>
+        {% endfor %}
+      </section>
+
+      <div id="cf12CharactersEmpty" class="cf-v7-frame cf12-characters-empty" hidden>
+        <span class="cf-v7-kicker">ХРОНИКИ / ПОИСК</span>
+        <h2>Персонаж не найден в текущем каталоге</h2>
+        <p>Сбрось фильтры или измени запрос. В выдачу попадают только персонажи с реальными профилями и существующими portrait-assets.</p>
+        <button id="cf12ResetFiltersEmpty" class="cf-v7-btn" type="button">СБРОСИТЬ ФИЛЬТРЫ</button>
+      </div>
+    </div>
+  </main>
+
+  {% include "components/footer.html" %}
+  <script src="/static/js/site.js?v=7.5"></script>
+  <script src="/static/js/final-v6.js?v=60.0"></script>
+  <script src="/static/js/final-v7.js?v=70.0"></script>
+  <script src="/static/js/stage12-characters.js?v=120.0" defer></script>
+  <script src="/static/js/stage14-portraits.js?v=141.1" defer></script>
+  <script src="/static/js/stage16-character-autodiscovery.js?v=160.0" defer></script>
+</body>
+</html>

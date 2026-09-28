@@ -1,0 +1,44 @@
+<!doctype html><html lang="ru" data-cf-final="1"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Гайды — CLIPFENDER</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/app.css?v=71.0"><link rel="stylesheet" href="/static/css/stage13-release.css?v=130.0">
+  {% include "components/seo.html" %}
+</head><body class="guides-page">{% include "components/header.html" %}<main class="cf-v7-page cf-guides-v7">
+  <div class="cf-v7-shell">
+    <span class="cf-v7-kicker">ХРОНИКИ / ПУТЕВОДИТЕЛЬ</span>
+    <h1 class="cf-v7-title">КАК ИСКАТЬ РОЛИКИ</h1>
+    <p class="cf-v7-lead">Пошаговый маршрут от имени персонажа до готового материала. Каждый шаг соответствует реальному действию внутри ClipFender.</p>
+    <div class="cf-guides-layout">
+      <section class="cf-v7-frame cf-v7-corners cf-guide-steps">
+        <div class="cf-guide-step"><b>01</b><div><h3>ВВЕДИ ИМЯ</h3><p>Начни с персонажа, названия сцены или ключевой фразы.</p></div></div>
+        <div class="cf-guide-step"><b>02</b><div><h3>НАСТРОЙ ФИЛЬТРЫ</h3><p>Выбери качество, длительность, тип сцены, музыку и режим поиска.</p></div></div>
+        <div class="cf-guide-step"><b>03</b><div><h3>СРАВНИ РЕЗУЛЬТАТЫ</h3><p>Используй Edit Score и метаданные, чтобы не просматривать случайные видео.</p></div></div>
+        <div class="cf-guide-step"><b>04</b><div><h3>ОТКРОЙ МАТЕРИАЛ</h3><p>Посмотри preview, детали и перейди к исходному видео.</p></div></div>
+        <div class="cf-guide-step"><b>05</b><div><h3>СОХРАНИ СЦЕНУ</h3><p>Собери личную коллекцию, чтобы не искать понравившийся кадр заново.</p></div></div>
+      </section>
+      <section class="cf-guide-art">
+        <div class="cf-guide-art__caption"><span class="cf-v7-kicker">СЦЕНА · ПРИМЕР МАРШРУТА</span><h2>Сначала кадр — потом монтаж</h2><p>ClipFender не заменяет монтаж. Он сокращает путь от идеи до подходящей сцены.</p></div>
+      </section>
+      <section class="cf-v7-frame cf-v7-corners cf-guide-search">
+        <span class="cf-v7-kicker">БЫСТРЫЙ ПЕРЕХОД</span><h2>Ввести персонажа</h2><p>Напиши имя — и сразу открой рабочую выдачу материалов.</p>
+        <form id="cfGuideSearchV7"><input type="search" placeholder="Например: Джон Сноу" aria-label="Поиск персонажа"><button class="cf-v7-btn" type="submit">НАЙТИ СЦЕНЫ</button></form>
+        <div class="cf-guide-tip">Совет: для эпичного монтажа добавляй к запросу слова «battle», «cinematic», «dialogue» или название конкретной сцены.</div>
+        <a class="cf-v7-btn cf-v7-btn--gold" style="margin-top:12px" href="/faq" data-cf-hard-nav>ОТКРЫТЬ FAQ</a>
+      </section>
+      <section class="cf-v7-frame cf-v7-corners cf-guide-idea" aria-labelledby="ideaGuideTitle">
+        <span class="cf-v7-kicker">НОВЫЙ РЕЖИМ · ИДЕЯ ДЛЯ ЭДИТА</span>
+        <h2 id="ideaGuideTitle">Собери не список видео, а монтажный сценарий</h2>
+        <p>Опиши идею, выбери настроение и темп, а при необходимости укажи персонажа и фильм/сериал. ClipFender подбирает только реальные материалы, которые уже есть в локальной базе, и распределяет их по четырём этапам.</p>
+        <div class="cf-guide-idea-grid">
+          <div><b>Настроение</b><span>экшн · тёмное · драма · романтика · эмоциональное · эпичное · напряжение · меланхолия</span></div>
+          <div><b>Темп</b><span>быстрые кадры · средний темп · медленный монтаж</span></div>
+          <div><b>Сценарий</b><span>интро → нарастание → кульминация → концовка</span></div>
+          <div><b>Почему подходит</b><span>Edit Score и реальные признаки материала: динамика, action, cinematic, качество, длительность и релевантность.</span></div>
+        </div>
+        <p class="cf-guide-note"><strong>Важно:</strong> пригодные для эдита материалы всегда стоят выше остальных на backend. Если старой записи не хватает сигналов, она не пропадает — она получает пометку <code>score_estimated</code> и уходит ниже рассчитанных результатов. Точные scene-level таймкоды сейчас не выдумываются: для них нужен отдельный источник данных.</p>
+        <a class="cf-v7-btn cf-v7-btn--gold" href="/search?mode=idea" data-cf-hard-nav>ОТКРЫТЬ РЕЖИМ «ИДЕЯ»</a>
+      </section>
+    </div>
+  </div>
+</main>{% include "components/footer.html" %}<script src="/static/js/site.js?v=7.5"></script>
+<script src="/static/js/final-v6.js?v=60.0"></script>
+<script src="/static/js/final-v7.js?v=70.0"></script>
+</body></html>

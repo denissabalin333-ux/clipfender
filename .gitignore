@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Local databases / runtime data
+*.db
+*.sqlite
+*.sqlite3
+
+# Node / tooling
+node_modules/
+.npm/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Release/build artifacts and internal maintenance snapshots
+_backup/
+_archive/
+evidence/
+*.zip
+*.sha256

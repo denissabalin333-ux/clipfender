@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 180" fill="none">
+<defs>
+ <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7b5c30"/><stop offset=".46" stop-color="#e0b66a"/><stop offset=".72" stop-color="#f2d69b"/><stop offset="1" stop-color="#7a5628"/></linearGradient>
+ <filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<g filter="url(#glow)">
+ <path d="M40 84L72 30L104 84L82 82L72 112L62 82Z" stroke="url(#g)" stroke-width="6"/>
+ <path d="M72 28V126M46 56H98" stroke="url(#g)" stroke-width="4" stroke-linecap="round"/>
+ <text x="130" y="113" font-family="Cinzel, Georgia, serif" font-size="78" letter-spacing="7" fill="url(#g)">CLIPFENDER</text>
+</g>
+<path d="M134 138H855" stroke="#b98b4a" stroke-opacity=".42"/>
+<text x="138" y="163" font-family="Montserrat, Arial, sans-serif" font-size="16" letter-spacing="5" fill="#b8a792">ЭПИЧЕСКИЕ МОМЕНТЫ ДЛЯ ТВОИХ ИСТОРИЙ</text>
+</svg>

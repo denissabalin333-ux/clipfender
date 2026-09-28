@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ClipFender — Component Kit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/design-tokens.css">
+  <link rel="stylesheet" href="../css/component-kit.css">
+  <style>
+    body{margin:0;min-height:100vh;background:#0B0C0F;color:#A79E8C}
+    .kit{width:min(1180px,92%);margin:0 auto;padding:56px 0 90px}
+    .kit-head{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;margin-bottom:32px}
+    .kit-brand{display:flex;gap:14px;align-items:center}
+    .kit-brand img{width:54px;height:66px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(200,155,60,.16))}
+    .kit-brand small{display:block;margin-bottom:5px;font:500 10px/1 var(--font-body);letter-spacing:2px;text-transform:uppercase;color:var(--text-dim)}
+    .kit-brand strong{font:500 28px/1 var(--font-display);letter-spacing:3px;color:var(--gold-light)}
+    .kit-note{max-width:430px;font:400 13px/1.6 var(--font-body);color:var(--text-muted)}
+    .kit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+    .kit-panel{padding:26px}
+    .kit-panel h2{margin:0 0 16px;font:600 20px/1.2 var(--font-display);letter-spacing:1.5px;color:var(--gold-light)}
+    .kit-row{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+    .kit-stack{display:grid;gap:14px}
+    .kit-field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .kit-swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+    .swatch{min-height:72px;padding:10px;display:flex;align-items:flex-end;border:1px solid var(--border-dark);font:500 10px/1.2 var(--font-body);letter-spacing:.6px}
+    .swatch b{font-weight:600}
+    .kit-footer{margin-top:20px;font:400 11px/1.5 var(--font-body);color:var(--text-dim)}
+    @media(max-width:820px){.kit-grid{grid-template-columns:1fr}.kit-head{align-items:flex-start;flex-direction:column}.kit-field-row{grid-template-columns:1fr}.kit-swatches{grid-template-columns:1fr 1fr}}
+  </style>
+<link rel="stylesheet" href="/static/css/final-stable.css?v=31.0"></head>
+<body class="cfk-shell">
+  <main class="kit">
+    <header class="kit-head">
+      <div class="kit-brand">
+        <img src="../assets/reference/cf-crest.svg" alt="Герб ClipFender">
+        <div><small>Stage 1 · Design foundation</small><strong>CLIPFENDER</strong></div>
+      </div>
+      <p class="kit-note">Базовый набор не трогает существующие классы проекта. Все новые примитивы имеют префикс <b>.cfk-</b> и предназначены для последующей сборки страниц по референсу.</p>
+    </header>
+
+    <section class="kit-grid">
+      <article class="cfk-metal kit-panel">
+        <h2>Цветовая система</h2>
+        <div class="kit-swatches">
+          <div class="swatch" style="background:#0B0C0F"><b>#0B0C0F · BG-0</b></div>
+          <div class="swatch" style="background:#121316"><b>#121316 · BG-1</b></div>
+          <div class="swatch" style="background:#1B1C20"><b>#1B1C20 · BG-2</b></div>
+          <div class="swatch" style="background:#2A2620"><b>#2A2620 · BG-3</b></div>
+          <div class="swatch" style="background:#C89B3C;color:#0B0C0F"><b>#C89B3C · GOLD</b></div>
+          <div class="swatch" style="background:#E0B86A;color:#0B0C0F"><b>#E0B86A · GOLD LIGHT</b></div>
+          <div class="swatch" style="background:#8B6D3A"><b>#8B6D3A · BRONZE</b></div>
+          <div class="swatch" style="background:#8A1E1E"><b>#8A1E1E · ERROR</b></div>
+        </div>
+      </article>
+
+      <article class="cfk-metal kit-panel">
+        <h2>Типографика</h2>
+        <div class="kit-stack">
+          <p class="cf-h1">CLIPFENDER</p>
+          <p class="cf-h2">ЭПИЧЕСКИЕ МОМЕНТЫ</p>
+          <p class="cf-subtitle">Найди нужную сцену для будущего эдита</p>
+          <p class="cf-body">Тёмное средневековое пространство, внутри которого находится современный инструмент поиска.</p>
+        </div>
+      </article>
+
+      <article class="cfk-metal kit-panel">
+        <h2>Кнопки · 4 состояния</h2>
+        <div class="kit-stack">
+          <div class="kit-row">
+            <button class="cfk-btn cfk-btn--primary">НАЙТИ РОЛИКИ</button>
+            <button class="cfk-btn cfk-btn--secondary">ПОДРОБНЕЕ</button>
+            <button class="cfk-btn cfk-btn--text">АРХИВ</button>
+            <button class="cfk-btn cfk-btn--danger">УДАЛИТЬ</button>
+          </div>
+          <div class="kit-row">
+            <button class="cfk-btn cfk-btn--primary" disabled>DISABLED</button>
+            <button class="cfk-btn cfk-btn--icon" aria-label="Открыть"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+          </div>
+          <div class="cfk-caption">Hover / Active / Disabled / Focus-visible реализованы на каждом примитиве.</div>
+        </div>
+      </article>
+
+      <article class="cfk-metal kit-panel">
+        <h2>Поля и фильтры</h2>
+        <div class="kit-field-row">
+          <label class="cfk-field"><span class="cfk-label">Персонаж</span><input class="cfk-input" placeholder="Например, Джон Сноу"></label>
+          <label class="cfk-field"><span class="cfk-label">Качество</span><select class="cfk-select"><option>1080p</option><option>720p</option><option>480p</option><option>4K</option></select></label>
+        </div>
+        <hr class="cfk-divider" style="margin:20px 0">
+        <div class="kit-row">
+          <label class="cfk-check"><input type="checkbox" checked><span aria-hidden="true"></span><em class="cf-body">Только лучшее</em></label>
+          <label class="cfk-check"><input type="checkbox"><span aria-hidden="true"></span><em class="cf-body">Без субтитров</em></label>
+          <label class="cfk-switch"><input type="checkbox" checked><span aria-hidden="true"></span><em class="cf-body">Автофильтр</em></label>
+        </div>
+      </article>
+
+      <article class="cfk-metal kit-panel">
+        <h2>Системные состояния</h2>
+        <div class="kit-stack">
+          <div class="cfk-state cfk-state--success"><div class="cfk-state__icon">✓</div><div><div class="cfk-state__title">Успех</div><div class="cfk-state__text">Ролик добавлен в коллекцию.</div></div></div>
+          <div class="cfk-state cfk-state--info"><div class="cfk-state__icon">i</div><div><div class="cfk-state__title">Информация</div><div class="cfk-state__text">Найден лучший материал для монтажа.</div></div></div>
+          <div class="cfk-state cfk-state--error"><div class="cfk-state__icon">×</div><div><div class="cfk-state__title">Ошибка</div><div class="cfk-state__text">Источник временно недоступен. Повторите поиск.</div></div></div>
+        </div>
+      </article>
+
+      <article class="cfk-metal kit-panel">
+        <h2>Иконки</h2>
+        <div class="kit-row">
+          <button class="cfk-icon-btn" aria-label="Поиск"><svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="5.7"/><path d="m15 15 4.4 4.4"/></svg></button>
+          <button class="cfk-icon-btn" aria-label="Добавить"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+          <button class="cfk-icon-btn" aria-label="Сохранить"><svg viewBox="0 0 24 24"><path d="M6 4h12v16H6zM8 4v6h8V4"/><path d="M9 16h6"/></svg></button>
+        </div>
+        <p class="kit-footer">На последующих этапах сюда будет подключён единый геральдический SVG-набор из референса, без generic-иконок там, где требуется конкретный символ.</p>
+      </article>
+    </section>
+  </main>
+<link rel="stylesheet" href="/static/css/final-v4.css?v=4.1"></body>
+</html>

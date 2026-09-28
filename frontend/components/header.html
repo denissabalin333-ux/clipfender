@@ -1,0 +1,32 @@
+<header class="cf2-header" data-cf2-header>
+  <div class="cf2-header__rail" aria-hidden="true"></div>
+  <div class="cf2-header__inner">
+    <a class="cf2-brand" href="/" data-cf-hard-nav aria-label="ClipFender — на главную">
+      <span class="cf2-brand__crest" aria-hidden="true"><img src="/static/assets/reference/cf-crest.svg" alt="" aria-hidden="true"></span>
+      <span class="cf2-brand__wordmark"><img src="/static/assets/reference/cf-wordmark.svg" alt="CLIPFENDER"></span>
+    </a>
+
+    <div class="cf2-header__actions">
+      <nav class="cf2-nav" id="navLinks" aria-label="Основная навигация">
+        <a data-route="/" href="/" data-cf-hard-nav data-i18n="nav.home">ГЛАВНАЯ</a>
+        <a data-route="/search" href="/search" data-cf-hard-nav data-i18n="nav.searchCharacter">НАЙТИ РОЛИК</a>
+        <a data-route="/characters" href="/characters" data-cf-hard-nav data-i18n="nav.characters">ПЕРСОНАЖИ</a>
+        <a data-route="/edit-ideas" href="/edit-ideas" data-cf-hard-nav data-i18n="nav.ideas">ИДЕИ ДЛЯ ЭДИТОВ</a>
+        <a data-route="/guides" href="/guides" data-cf-hard-nav data-i18n="nav.guides">ГАЙДЫ</a>
+        <a data-route="/help" href="/help" data-cf-hard-nav data-i18n="nav.help">ПОМОЩЬ</a>
+        <a data-route="/project" href="/project" data-cf-hard-nav data-i18n="nav.project">О ПРОЕКТЕ</a>
+        <a data-route="/library" href="/library" data-cf-hard-nav data-i18n="nav.library">БИБЛИОТЕКА</a>
+        <span class="cf2-nav__rule" aria-hidden="true"></span>
+        <button type="button" class="cf-i18n-toggle" data-cf-language-toggle data-i18n-aria="language.toggle" aria-label="Переключить язык"><span data-cf-language-label>EN</span></button>
+        <a class="cf2-nav__login" data-route="/login" href="/login" data-cf-hard-nav data-i18n="nav.login">ВОЙТИ</a>
+      </nav>
+
+      <button class="cf2-mobile-toggle mobile-menu-btn" type="button" onclick="toggleMobileMenu()" aria-label="Открыть меню" aria-expanded="false" aria-controls="navLinks">
+        <span class="cf2-mobile-toggle__bars" aria-hidden="true"><i></i><i></i><i></i></span>
+      </button>
+    </div>
+  </div>
+  <div class="cf2-mobile-backdrop" data-mobile-backdrop aria-hidden="true"></div>
+</header>
+
+<script src="/static/js/stage11-i18n.js?v=110.0" defer></script>

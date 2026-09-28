@@ -1,0 +1,233 @@
+/*
+ * ClipFender Stage 13 release polish.
+ *
+ * This stylesheet is intentionally appended after the legacy application
+ * styles. Historical files remain intact in _archive/stage13 and
+ * _backup/stage13; these rules only establish the final active layout.
+ */
+
+/* ============================================================
+   GUIDES — wide editorial grid
+   ============================================================ */
+
+.cf-guides-v7 .cf-guides-layout {
+  display: grid;
+  grid-template-columns: minmax(250px, 0.78fr) minmax(360px, 1.28fr) minmax(250px, 0.80fr);
+  gap: 18px;
+  align-items: stretch;
+  margin-top: 28px;
+}
+
+.cf-guides-v7 .cf-guide-steps,
+.cf-guides-v7 .cf-guide-art,
+.cf-guides-v7 .cf-guide-search,
+.cf-guides-v7 .cf-guide-idea {
+  min-width: 0;
+}
+
+.cf-guides-v7 .cf-guide-steps {
+  display: grid;
+  align-content: start;
+  padding: 18px;
+}
+
+.cf-guides-v7 .cf-guide-step {
+  min-width: 0;
+}
+
+.cf-guides-v7 .cf-guide-art {
+  min-height: 430px;
+}
+
+.cf-guides-v7 .cf-guide-search {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 20px;
+}
+
+.cf-guides-v7 .cf-guide-search form {
+  display: grid;
+  gap: 8px;
+}
+
+.cf-guides-v7 .cf-guide-search .cf-v7-btn {
+  width: 100%;
+}
+
+.cf-guides-v7 .cf-guide-idea {
+  grid-column: 1 / -1;
+  padding: 24px;
+}
+
+.cf-guides-v7 .cf-guide-idea > h2 {
+  max-width: 900px;
+  margin-bottom: 10px;
+}
+
+.cf-guides-v7 .cf-guide-idea > p {
+  max-width: 980px;
+}
+
+.cf-guides-v7 .cf-guide-idea-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.cf-guides-v7 .cf-guide-idea-grid > div {
+  min-width: 0;
+  min-height: 132px;
+  padding: 15px;
+  border: 1px solid rgba(200, 155, 60, 0.17);
+  background: linear-gradient(180deg, rgba(10, 15, 18, 0.88), rgba(7, 11, 13, 0.72));
+}
+
+.cf-guides-v7 .cf-guide-idea-grid > div b {
+  display: block;
+  margin-bottom: 9px;
+  color: #d9bb7c;
+  font: 600 9px/1.3 'Montserrat', sans-serif;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.cf-guides-v7 .cf-guide-idea-grid > div span {
+  display: block;
+  color: #938b80;
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.cf-guides-v7 .cf-guide-note {
+  grid-column: 1 / -1;
+  max-width: none;
+  margin: 12px 0 0;
+  padding: 14px 15px;
+  border-left: 2px solid rgba(200, 155, 60, 0.32);
+  border-top: 1px solid rgba(200, 155, 60, 0.11);
+  color: #847b6f;
+  background: rgba(8, 12, 14, 0.48);
+}
+
+.cf-guides-v7 .cf-guide-note strong {
+  color: #c5a76b;
+}
+
+.cf-guides-v7 .cf-guide-note code {
+  color: #dbc58f;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.cf-guides-v7 .cf-guides-layout .cf-guide-idea .cf-v7-btn {
+  margin-top: 18px;
+}
+
+@media (max-width: 1100px) {
+  .cf-guides-v7 .cf-guides-layout {
+    grid-template-columns: minmax(260px, 0.84fr) minmax(340px, 1.16fr);
+  }
+
+  .cf-guides-v7 .cf-guide-search {
+    grid-column: 1 / -1;
+  }
+
+  .cf-guides-v7 .cf-guide-idea {
+    grid-column: 1 / -1;
+  }
+
+  .cf-guides-v7 .cf-guide-idea-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .cf-guides-v7 .cf-guides-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .cf-guides-v7 .cf-guide-search,
+  .cf-guides-v7 .cf-guide-idea {
+    grid-column: auto;
+  }
+
+  .cf-guides-v7 .cf-guide-art {
+    min-height: 330px;
+  }
+
+  .cf-guides-v7 .cf-guide-idea-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .cf-guides-v7 .cf-guide-art {
+    min-height: 280px;
+  }
+
+  .cf-guides-v7 .cf-guide-steps,
+  .cf-guides-v7 .cf-guide-search,
+  .cf-guides-v7 .cf-guide-idea {
+    padding: 16px;
+  }
+}
+
+/* ============================================================
+   ARCHIVE — bounded crest + reliable result empty state
+   ============================================================ */
+
+body.cf4-active .cf4-results-head {
+  min-width: 0;
+}
+
+body.cf4-active .cf4-results-head .cf4-signet {
+  width: 68px !important;
+  height: 76px !important;
+  min-width: 68px !important;
+  min-height: 76px !important;
+  flex: 0 0 68px !important;
+  display: grid !important;
+  place-items: center !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+body.cf4-active .cf4-results-head .cf4-signet img {
+  display: block !important;
+  width: 46px !important;
+  height: 58px !important;
+  max-width: 46px !important;
+  max-height: 58px !important;
+  object-fit: contain !important;
+  object-position: center !important;
+}
+
+body.cf4-active .cf4-results-head .cf4-signet img[width],
+body.cf4-active .cf4-results-head .cf4-signet img[height] {
+  width: 46px !important;
+  height: 58px !important;
+}
+
+body.cf4-active .cf4-results-shell {
+  overflow: hidden !important;
+}
+
+@media (max-width: 680px) {
+  body.cf4-active .cf4-results-head .cf4-signet {
+    display: none !important;
+  }
+}
+
+/* ============================================================
+   DEFAULT RESULT EMPHASIS
+   ============================================================ */
+
+body.cf4-active #videos {
+  min-height: 18px;
+}
+
+body.cf4-active .video-card .edit-ribbon {
+  letter-spacing: 0.035em;
+}

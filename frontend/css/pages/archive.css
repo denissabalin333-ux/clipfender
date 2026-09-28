@@ -1,0 +1,6 @@
+body.archive-page .container,
+body.archive-page .cf4-results-shell,
+body.archive-page .content-shell {
+  position: relative;
+  z-index: var(--z-content);
+}

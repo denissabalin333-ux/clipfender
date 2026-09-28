@@ -1,0 +1,9 @@
+body.home-page .home-stage3__center,
+body.home-page .home-stage3__below {
+  position: relative;
+  z-index: var(--z-content);
+}
+
+body.home-page .home-stage3__veil {
+  pointer-events: none;
+}

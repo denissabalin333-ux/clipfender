@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 800" preserveAspectRatio="xMidYMid slice">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#050708"/><stop offset=".7" stop-color="#0f1415"/><stop offset="1" stop-color="#16110b"/></linearGradient><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#6a552f"/><stop offset=".5" stop-color="#d0a251"/><stop offset="1" stop-color="#453016"/></linearGradient><filter id="blur"><feGaussianBlur stdDeviation="20"/></filter></defs>
+<rect width="1600" height="800" fill="url(#bg)"/>
+<path d="M0 600 L100 520 210 565 300 450 400 570 520 500 640 590 760 460 890 560 1030 420 1170 560 1320 460 1470 540 1600 450 V800 H0Z" fill="#090d0f"/>
+<g fill="#161717" stroke="url(#gold)" stroke-width="3" opacity=".95"><path d="M170 590 V275 l65 -68 65 68 v315Z"/><path d="M300 590 V190 l75 -82 75 82 v400Z"/><path d="M450 590 V245 l66 -72 66 72 v345Z"/><path d="M1160 590 V250 l67 -74 67 74 v340Z"/><path d="M1295 590 V180 l78 -87 78 87 v410Z"/><path d="M1450 590 V265 l62 -70 62 70 v325Z"/></g>
+<g fill="#c89b3c" opacity=".8"><rect x="220" y="340" width="13" height="30"/><rect x="337" y="270" width="15" height="34"/><rect x="491" y="325" width="13" height="29"/><rect x="1190" y="327" width="13" height="29"/><rect x="1328" y="255" width="15" height="35"/><rect x="1476" y="342" width="12" height="30"/></g>
+<!-- dragon silhouette -->
+<g fill="#0a0a0a" stroke="#8b6d3a" stroke-width="2" opacity=".95">
+<path d="M1030 470 C1075 426 1130 404 1185 412 C1212 378 1246 356 1270 358 C1284 360 1285 378 1275 392 C1318 397 1363 415 1395 445 C1412 461 1418 482 1406 495 C1390 512 1368 503 1344 487 C1328 476 1312 472 1294 476 L1323 530 C1335 550 1334 566 1318 572 C1304 577 1294 563 1287 548 L1260 498 C1219 526 1176 543 1126 547 C1088 550 1050 536 1024 510 Z"/>
+<path d="M1180 420 C1166 387 1140 357 1112 334 C1102 326 1105 315 1119 315 C1158 316 1191 340 1213 374" fill="none"/>
+<path d="M1273 396 C1290 364 1311 340 1339 325 C1349 320 1354 330 1348 340 L1324 376" fill="none"/>
+<path d="M1080 512 C1050 535 1014 557 976 574" fill="none"/>
+</g>
+<ellipse cx="1200" cy="480" rx="340" ry="105" fill="#c89b3c" opacity=".10" filter="url(#blur)"/>
+<path d="M0 685 C260 630 490 700 750 664 S1180 640 1600 680" fill="none" stroke="#6a5732" stroke-width="3" opacity=".45"/>
+</svg>

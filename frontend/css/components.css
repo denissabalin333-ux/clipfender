@@ -1,0 +1,60 @@
+/*
+ * ClipFender — Stage 1 shared components and stacking contract
+ * Keep decorative layers non-interactive; content remains above them.
+ */
+
+:where(.cf2-header, .cf2-mobile-backdrop, .cf2-nav, .modal, #toast, .cfx-page-transition) {
+  isolation: isolate;
+}
+
+.cf2-header {
+  z-index: var(--z-header);
+}
+
+.cf2-header__rail,
+.cf2-mobile-backdrop {
+  pointer-events: none;
+}
+
+body.menu-open {
+  overflow: hidden;
+}
+
+:where(
+  .home-stage3__scene,
+  .home-stage3__fog,
+  .home-stage3__embers,
+  .home-stage3__veil,
+  .home-stage3__ornament,
+  .cf-search-page__scene,
+  .cf-search-page__fog,
+  .cf-search-page__veil,
+  .cf-search-page__embers,
+  .site-noise,
+  .embers,
+  .hero-art,
+  .hero-vignette,
+  .hero-center-glow
+) {
+  pointer-events: none;
+}
+
+:where(.home-stage3__scene, .home-stage3__fog, .home-stage3__embers, .home-stage3__veil, .home-stage3__ornament, .cf-search-page__scene, .cf-search-page__fog, .cf-search-page__veil, .cf-search-page__embers) {
+  z-index: var(--z-decoration);
+}
+
+:where(.cf2-header, .cf-home-v7, .cf-new-page, .cf-search-page, .cf4-page, .cf-video-layout) {
+  position: relative;
+}
+
+#toast {
+  z-index: var(--z-toast);
+}
+
+:where(.modal, .modal-backdrop, [role="dialog"]) {
+  z-index: var(--z-modal);
+}
+
+.cfx-page-transition {
+  z-index: var(--z-transition);
+}

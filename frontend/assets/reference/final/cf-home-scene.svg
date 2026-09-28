@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 900" preserveAspectRatio="xMidYMid slice">
+<defs>
+ <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#06090d"/><stop offset=".52" stop-color="#0d1215"/><stop offset="1" stop-color="#050608"/></linearGradient>
+ <linearGradient id="stone" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#31312e"/><stop offset="1" stop-color="#171916"/></linearGradient>
+ <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#6f5a31"/><stop offset=".45" stop-color="#c89b3c"/><stop offset="1" stop-color="#4a3518"/></linearGradient>
+ <radialGradient id="moon"><stop stop-color="#f2dfb0" stop-opacity=".55"/><stop offset="1" stop-color="#b99561" stop-opacity="0"/></radialGradient>
+ <linearGradient id="mist" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#0d1113" stop-opacity="0"/><stop offset=".45" stop-color="#8e8571" stop-opacity=".12"/><stop offset=".75" stop-color="#8e8571" stop-opacity=".05"/><stop offset="1" stop-color="#0d1113" stop-opacity="0"/></linearGradient>
+ <filter id="blur"><feGaussianBlur stdDeviation="22"/></filter>
+ <filter id="glow"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <pattern id="grain" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="2" cy="3" r=".7" fill="#c89b3c" opacity=".05"/><circle cx="9" cy="10" r=".55" fill="#fff" opacity=".03"/></pattern>
+</defs>
+<rect width="1920" height="900" fill="url(#sky)"/>
+<circle cx="440" cy="140" r="180" fill="url(#moon)" filter="url(#blur)"/>
+<circle cx="1600" cy="185" r="150" fill="url(#moon)" filter="url(#blur)"/>
+<!-- distant mountain wall -->
+<path d="M0 570 L130 450 250 515 370 390 520 505 660 420 820 520 980 430 1130 530 1280 390 1450 520 1620 410 1800 520 1920 460 1920 720 0 720Z" fill="#0a0e10"/>
+<path d="M0 612 C260 550 440 625 680 585 S1110 555 1350 610 1710 555 1920 600 L1920 735 0 735Z" fill="#161714" opacity=".72"/>
+<!-- left iron throne silhouette -->
+<g opacity=".88">
+ <path d="M40 690 L50 500 80 420 105 500 128 340 152 490 190 270 215 485 252 360 276 495 315 315 337 500 370 430 395 690Z" fill="#0b0c0d" stroke="url(#gold)" stroke-width="2"/>
+ <g stroke="#5c4d2d" stroke-width="7" stroke-linecap="round" opacity=".6">
+  <path d="M74 500 L155 690 M142 476 L220 690 M207 484 L284 690 M270 495 L345 690"/>
+ </g>
+</g>
+<!-- central castle / keep -->
+<g stroke="url(#gold)" stroke-width="3">
+ <path d="M650 680 V300 L710 245 770 300 V680" fill="url(#stone)"/>
+ <path d="M770 680 V220 L835 158 900 220 V680" fill="url(#stone)"/>
+ <path d="M900 680 V285 L965 220 1030 285 V680" fill="url(#stone)"/>
+ <path d="M1030 680 V190 L1100 125 1170 190 V680" fill="url(#stone)"/>
+ <path d="M1170 680 V275 L1232 210 1295 275 V680" fill="url(#stone)"/>
+ <path d="M1295 680 V315 L1350 258 1405 315 V680" fill="url(#stone)"/>
+</g>
+<!-- crenellations -->
+<g fill="#1b1c1d" stroke="url(#gold)" stroke-width="2">
+ <path d="M645 300 l65 -70 65 70 -16 0 -49 -52 -49 52z"/>
+ <path d="M765 220 l70 -78 70 78 -18 0 -52 -58 -52 58z"/>
+ <path d="M895 285 l70 -78 70 78 -18 0 -52 -58 -52 58z"/>
+ <path d="M1025 190 l75 -84 75 84 -18 0 -57 -63 -57 63z"/>
+ <path d="M1165 275 l67 -73 63 73 -17 0 -46 -54 -50 54z"/>
+ <path d="M1290 315 l60 -67 60 67 -16 0 -44 -50 -44 50z"/>
+</g>
+<!-- lit windows -->
+<g fill="#d8ad59" filter="url(#glow)">
+ <rect x="694" y="378" width="12" height="31" rx="5"/><rect x="815" y="330" width="14" height="34" rx="6"/>
+ <rect x="950" y="388" width="13" height="33" rx="6"/><rect x="1085" y="306" width="15" height="38" rx="6"/>
+ <rect x="1211" y="374" width="13" height="34" rx="6"/><rect x="1325" y="400" width="12" height="30" rx="5"/>
+</g>
+<!-- foreground wall and gate -->
+<path d="M0 675 C270 630 420 700 635 671 S1000 632 1270 675 1660 635 1920 675 V900 H0Z" fill="#090b0c"/>
+<path d="M0 690 C290 650 420 715 640 686 S1020 648 1280 688 1660 650 1920 690" fill="none" stroke="#5e5030" stroke-width="3" opacity=".45"/>
+<path d="M840 900 V770 Q960 655 1080 770 V900Z" fill="#080a0b" stroke="url(#gold)" stroke-width="3"/>
+<path d="M958 730 V865" stroke="#7b6337" stroke-width="2" opacity=".45"/>
+<!-- warm pools -->
+<ellipse cx="530" cy="735" rx="280" ry="85" fill="#b97731" opacity=".11" filter="url(#blur)"/>
+<ellipse cx="1440" cy="740" rx="330" ry="100" fill="#c89b3c" opacity=".10" filter="url(#blur)"/>
+<!-- mist ribbons -->
+<path d="M0 620 C290 550 440 675 710 610 S1110 565 1390 620 1710 575 1920 620" fill="none" stroke="url(#mist)" stroke-width="75" opacity=".42" filter="url(#blur)"/>
+<rect width="1920" height="900" fill="url(#grain)"/>
+</svg>

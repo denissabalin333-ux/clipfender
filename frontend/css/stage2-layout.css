@@ -1,0 +1,655 @@
+/*
+ * ClipFender — Stage 2 layout normalization.
+ *
+ * This layer is deliberately additive. Legacy visual CSS stays intact;
+ * this file owns only document flow, responsive grids, stacking and
+ * interaction-safe overlays.
+ */
+
+:root {
+  --stage2-content: min(var(--content-max), calc(100% - (var(--page-gutter) * 2)));
+  --stage2-header-height: var(--header-offset);
+  --stage2-mobile-gutter: 12px;
+}
+
+html {
+  overflow-x: clip;
+  scroll-padding-top: calc(var(--stage2-header-height) + 12px);
+}
+
+body {
+  min-width: 0;
+  overflow-x: clip;
+}
+
+/* The shared shell participates in normal flow instead of covering content. */
+.cf2-header {
+  position: sticky !important;
+  inset-block-start: 0 !important;
+  inset-inline: 0 !important;
+  height: var(--stage2-header-height) !important;
+  min-height: var(--stage2-header-height) !important;
+  z-index: var(--z-header) !important;
+}
+
+.cf2-header__inner {
+  width: var(--stage2-content) !important;
+  min-height: var(--stage2-header-height) !important;
+  height: var(--stage2-header-height) !important;
+  margin-inline: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: clamp(12px, 2vw, 28px) !important;
+}
+
+.cf2-header__actions {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.cf2-nav {
+  min-width: 0;
+  display: flex !important;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.cf2-nav a {
+  flex: 0 0 auto;
+}
+
+.cf2-mobile-toggle {
+  position: relative;
+  z-index: var(--z-dropdown);
+}
+
+.cf2-mobile-backdrop {
+  position: fixed;
+  inset: var(--stage2-header-height) 0 0;
+  z-index: calc(var(--z-header) + 1);
+  display: block !important;
+  background: linear-gradient(180deg, rgba(2, 4, 5, .82), rgba(2, 4, 5, .94));
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .22s var(--ease-ui), visibility .22s var(--ease-ui);
+}
+
+.cf2-header:has(.cf2-nav.open) .cf2-mobile-backdrop {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.cf2-nav.open {
+  z-index: calc(var(--z-dropdown) + 1);
+}
+
+body.menu-open {
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+/* Content root: normal document flow only. */
+main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  isolation: isolate;
+}
+
+main > section,
+main > .section,
+main > .cf-v7-page,
+main > .cf-new-page,
+main > .content-shell {
+  min-width: 0;
+}
+
+/* Decorative layers never become hit-test targets. */
+:where(
+  .site-noise,
+  .embers,
+  .ember,
+  .hero-art,
+  .hero-art-left,
+  .hero-art-right,
+  .hero-vignette,
+  .hero-center-glow,
+  .auth-art,
+  .workshop-panel-rich,
+  .services-hero::after,
+  .page-hero::before,
+  .page-hero::after,
+  .cf-v7-page::before,
+  .cf-v7-page::after,
+  .cf-guide-art::after,
+  .home-stage3__scene,
+  .home-stage3__fog,
+  .home-stage3__embers,
+  .home-stage3__veil,
+  .home-stage3__ornament,
+  .cf-search-page__scene,
+  .cf-search-page__fog,
+  .cf-search-page__veil,
+  .cf-search-page__embers
+) {
+  pointer-events: none;
+}
+
+/* V7 reference pages previously floated the header over the first 72–120 px. */
+body:has(.cf-character-search-v7) .cf2-header,
+body:has(.cf-characters-v7) .cf2-header,
+body:has(.cf-guides-v7) .cf2-header,
+body:has(.cf-help-v7) .cf2-header,
+body:has(.cf-project-v7) .cf2-header,
+body:has(.cf-about-v7) .cf2-header,
+body:has(.cf-ideas-v7) .cf2-header {
+  position: sticky !important;
+  inset-block-start: 0 !important;
+  background: linear-gradient(180deg, rgba(6, 9, 11, .985), rgba(6, 9, 11, .94)) !important;
+  border-bottom-color: rgba(200, 155, 60, .20) !important;
+}
+
+body:has(.cf-character-search-v7) .cf-character-search-v7,
+body:has(.cf-characters-v7) .cf-characters-v7,
+body:has(.cf-guides-v7) .cf-guides-v7,
+body:has(.cf-help-v7) .cf-help-v7,
+body:has(.cf-project-v7) .cf-project-v7,
+body:has(.cf-about-v7) .cf-about-v7,
+body:has(.cf-ideas-v7) .cf-ideas-v7 {
+  padding-top: 48px !important;
+}
+
+/* Keep the page shells as normal flow containers. */
+.cf-v7-page,
+.cf-new-page,
+.cf-search-page__content {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  overflow: clip;
+}
+
+.cf-v7-shell,
+.cf-new-shell {
+  width: var(--stage2-content) !important;
+  max-width: var(--content-max) !important;
+  margin-inline: auto !important;
+}
+
+.cf-v7-shell,
+.cf-new-shell {
+  display: flex;
+  flex-direction: column;
+}
+
+/* V7 grids: fluid desktop → tablet → one-column mobile. */
+.cf-search-hero,
+.cf-guides-layout,
+.cf-help-layout,
+.cf-project-layout,
+.cf-ideas-layout,
+.cf-video-layout {
+  min-width: 0;
+}
+
+.cf-search-hero {
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, .85fr) !important;
+  gap: clamp(20px, 3vw, 34px) !important;
+}
+
+.cf-search-card,
+.cf-profile-result__card,
+.cf-character-toolbar,
+.cf-ideas-search-v7 {
+  min-width: 0;
+}
+
+.cf-search-form,
+.cf-ideas-search-v7 {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+}
+
+.cf-popular-grid,
+.cf-character-grid-v7,
+.cf-ideas-grid-v7,
+.cf-help-cards {
+  grid-auto-flow: row;
+}
+
+.cf-character-grid-v7 {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+.cf-ideas-grid-v7 {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+.cf-guides-layout {
+  grid-template-columns: minmax(210px, .72fr) minmax(0, 1.2fr) minmax(230px, .82fr) !important;
+}
+
+.cf-help-layout {
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, .85fr) !important;
+}
+
+.cf-project-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+}
+
+.cf-ideas-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 300px) !important;
+}
+
+.cf-video-layout {
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, .5fr) !important;
+}
+
+.cf-profile-result__card {
+  grid-template-columns: 150px minmax(0, 1fr) !important;
+}
+
+/* Legacy/reference pages: keep their main content in explicit responsive grids. */
+.page-hero,
+.services-hero,
+.auth-hero {
+  width: 100%;
+  min-width: 0;
+}
+
+.page-hero {
+  padding-top: clamp(54px, 7vw, 96px);
+}
+
+.auth-hero {
+  min-height: calc(100vh - var(--stage2-header-height));
+  padding: clamp(48px, 7vw, 90px) var(--page-gutter) 70px;
+}
+
+.auth-center {
+  width: min(1050px, 100%);
+}
+
+.about-workshop,
+.contact-grid-rich,
+.portfolio-intro,
+.featured-project-rich,
+.faq-layout,
+.contact-grid,
+.auth-grid,
+.parchment-grid,
+.portfolio-grid-rich,
+.service-grid-rich,
+.advantages-rich,
+.reviews-rich,
+.process-rich {
+  min-width: 0;
+}
+
+.about-workshop,
+.contact-grid-rich,
+.faq-layout,
+.auth-grid,
+.featured-project-rich {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.portfolio-grid-rich,
+.portfolio-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.service-grid-rich {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.process-rich {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.advantages-rich {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.parchment-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Interactive content always sits above pseudo-element decoration. */
+:where(.page-hero-content, .auth-center, .section-title, .cf-v7-shell, .cf-new-shell, .contact-grid-rich, .portfolio-intro, .portfolio-grid-rich, .service-grid-rich, .faq-layout, .about-workshop, .process-rich, .reviews-rich) {
+  position: relative;
+  z-index: var(--z-content);
+}
+
+/* Prevent long labels and controls from forcing horizontal scroll. */
+:where(
+  .cf-v7-title,
+  .cf-v7-lead,
+  .cf-new-shell > h1,
+  .page-hero h1,
+  .auth-center h1,
+  .home-stage3__title,
+  .cf-character-card-v7 h3,
+  .cf-idea-v7 h3
+) {
+  overflow-wrap: anywhere;
+}
+
+:where(input, select, textarea, button) {
+  max-width: 100%;
+}
+
+@media (max-width: 1100px) {
+  .cf2-nav {
+    gap: 13px !important;
+  }
+
+  .cf2-nav a {
+    font-size: 8px !important;
+  }
+
+  .cf-search-hero,
+  .cf-project-layout,
+  .cf-help-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .cf-search-copy {
+    padding-inline-start: 0;
+  }
+
+  .cf-guides-layout {
+    grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr) !important;
+  }
+
+  .cf-guide-search {
+    grid-column: 1 / -1;
+  }
+
+  .cf-character-grid-v7,
+  .cf-ideas-grid-v7 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .cf-ideas-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .cf-ideas-side {
+    order: 2;
+  }
+
+  .portfolio-grid-rich,
+  .portfolio-grid,
+  .service-grid-rich {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .process-rich {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .process-rich > div:nth-child(3)::after {
+    display: none;
+  }
+}
+
+@media (max-width: 820px) {
+  :root {
+    --page-gutter: 18px;
+    --header-offset: 64px;
+  }
+
+  .cf2-header,
+  .cf2-header__inner {
+    min-height: var(--header-offset) !important;
+    height: var(--header-offset) !important;
+  }
+
+  .cf2-header__inner {
+    width: calc(100% - 24px) !important;
+  }
+
+  .cf2-brand__wordmark {
+    width: clamp(116px, 26vw, 145px) !important;
+  }
+
+  .cf2-mobile-backdrop {
+    inset-block-start: var(--header-offset);
+  }
+
+  .cf2-mobile-toggle {
+    display: inline-flex !important;
+    width: 42px;
+    height: 42px;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+  }
+
+  .cf2-nav {
+    position: fixed !important;
+    inset: var(--header-offset) 12px auto;
+    max-height: min(72vh, 520px);
+    overflow: auto;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0 !important;
+    padding: 10px !important;
+    background: linear-gradient(180deg, #0a0f12, #080c0f) !important;
+    border: 1px solid rgba(200,155,60,.26) !important;
+    box-shadow: 0 26px 70px rgba(0,0,0,.58) !important;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-8px) scale(.985);
+    transform-origin: top center;
+    transition: opacity .22s var(--ease-ui), transform .22s var(--ease-ui), visibility .22s var(--ease-ui);
+  }
+
+  .cf2-nav.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: none;
+  }
+
+  .cf2-nav a {
+    display: flex !important;
+    min-height: 46px;
+    align-items: center;
+    padding: 12px !important;
+    border-bottom: 1px solid rgba(200,155,60,.08);
+  }
+
+  .cf2-nav__rule {
+    display: none !important;
+  }
+
+  .cf2-nav__login {
+    justify-content: center;
+    margin-top: 7px;
+    border: 1px solid rgba(200,155,60,.28) !important;
+  }
+
+  .cf-character-search-v7,
+  .cf-characters-v7,
+  .cf-guides-v7,
+  .cf-help-v7,
+  .cf-project-v7,
+  .cf-about-v7,
+  .cf-ideas-v7 {
+    padding-top: 34px !important;
+  }
+
+  .cf-v7-page {
+    padding-bottom: 58px;
+  }
+
+  .cf-v7-shell,
+  .cf-new-shell {
+    width: calc(100% - 36px) !important;
+  }
+
+  .cf-search-hero {
+    min-height: 0;
+  }
+
+  .cf-popular-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .cf-character-grid-v7,
+  .cf-ideas-grid-v7,
+  .portfolio-grid-rich,
+  .portfolio-grid,
+  .service-grid-rich,
+  .advantages-rich {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .cf-guides-layout,
+  .cf-help-layout,
+  .cf-project-layout,
+  .faq-layout,
+  .about-workshop,
+  .contact-grid-rich,
+  .auth-grid,
+  .featured-project-rich {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .cf-guide-search {
+    grid-column: auto;
+  }
+
+  .cf-video-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .process-rich {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .process-rich > div::after {
+    display: none;
+  }
+
+  .about-copy-rich,
+  .contact-chronicle,
+  .contact-form-rich,
+  .cf-project-copy,
+  .cf-project-map,
+  .cf-guide-steps,
+  .cf-guide-search,
+  .cf-search-card,
+  .cf-ideas-side {
+    padding: 20px;
+  }
+
+  .page-hero {
+    min-height: 340px;
+  }
+
+  .auth-center h1 {
+    font-size: clamp(34px, 8vw, 54px);
+  }
+
+  .home-stage3 {
+    min-height: calc(100svh - var(--header-offset)) !important;
+    height: auto !important;
+  }
+
+  .home-stage3__center {
+    width: min(860px, calc(100% - 30px)) !important;
+    padding-block: 44px 28px !important;
+  }
+
+  .home-stage3__search {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .cf2-brand__crest {
+    width: 27px !important;
+    height: 32px !important;
+  }
+
+  .cf2-brand__wordmark {
+    width: 110px !important;
+  }
+
+  .cf-v7-shell,
+  .cf-new-shell {
+    width: calc(100% - 24px) !important;
+  }
+
+  .cf-popular-grid,
+  .cf-character-grid-v7,
+  .cf-ideas-grid-v7,
+  .portfolio-grid-rich,
+  .portfolio-grid,
+  .service-grid-rich,
+  .advantages-rich,
+  .process-rich,
+  .parchment-grid,
+  .reviews-rich {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .cf-profile-result__card {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .cf-profile-result__card img {
+    width: min(100%, 260px);
+    margin-inline: auto;
+  }
+
+  .cf-search-form,
+  .cf-ideas-search-v7 {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .page-hero {
+    min-height: 300px;
+    padding-block: 42px 34px;
+  }
+
+  .page-hero h1 {
+    letter-spacing: .08em;
+  }
+
+  .auth-hero {
+    min-height: auto;
+    padding-block: 42px 56px;
+  }
+
+  .home-stage3__title {
+    font-size: clamp(42px, 15vw, 68px) !important;
+  }
+
+  .home-stage3__seal {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cf2-mobile-backdrop,
+  .cf2-nav,
+  .cf-v7-btn,
+  .cf-popular-card,
+  .cf-character-card-v7,
+  .cf-idea-v7 {
+    transition: none !important;
+  }
+}

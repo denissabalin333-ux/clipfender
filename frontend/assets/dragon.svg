@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720">
+<defs>
+ <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#05080a"/><stop offset=".48" stop-color="#1a0d09"/><stop offset="1" stop-color="#060708"/></linearGradient>
+ <radialGradient id="fire"><stop stop-color="#f2c06a" stop-opacity=".95"/><stop offset=".2" stop-color="#c76031" stop-opacity=".65"/><stop offset="1" stop-color="#7b2118" stop-opacity="0"/></radialGradient>
+ <linearGradient id="wing" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#1a0d0b"/><stop offset=".5" stop-color="#6e2e21"/><stop offset="1" stop-color="#140907"/></linearGradient>
+ <linearGradient id="body" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#25100c"/><stop offset="1" stop-color="#090707"/></linearGradient>
+ <filter id="glow"><feGaussianBlur stdDeviation="16"/></filter>
+ <filter id="shadow"><feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#000" flood-opacity=".78"/></filter>
+</defs>
+<rect width="1200" height="720" fill="url(#sky)"/>
+<circle cx="240" cy="160" r="120" fill="url(#fire)" filter="url(#glow)"/><circle cx="1000" cy="165" r="110" fill="url(#fire)" filter="url(#glow)"/>
+<path d="M0 620 Q190 565 370 602 T730 590 T1200 570V720H0Z" fill="#050607"/>
+<!-- left wing -->
+<path d="M585 286 Q420 120 96 152 Q228 190 365 351 Q458 305 585 286Z" fill="url(#wing)" stroke="#7d3827" stroke-width="8"/>
+<path d="M450 285 Q308 220 143 200 M373 340 Q277 307 200 270" fill="none" stroke="#9a4a32" stroke-width="5" opacity=".7"/>
+<!-- right wing -->
+<path d="M615 286 Q780 120 1104 152 Q972 190 835 351 Q742 305 615 286Z" fill="url(#wing)" stroke="#7d3827" stroke-width="8"/>
+<path d="M750 285 Q892 220 1057 200 M827 340 Q923 307 1000 270" fill="none" stroke="#9a4a32" stroke-width="5" opacity=".7"/>
+<!-- body -->
+<path d="M420 350 Q490 255 600 250 Q710 255 780 350 L716 500 Q600 566 484 500Z" fill="url(#body)" stroke="#6b2b20" stroke-width="8" filter="url(#shadow)"/>
+<!-- neck and head -->
+<path d="M505 343 Q525 236 600 206 Q675 236 695 343 L658 392 L542 392Z" fill="#0b0808" stroke="#713024" stroke-width="7"/>
+<path d="M545 208 L600 156 L655 208 L636 274 L564 274Z" fill="#120807" stroke="#7d3827" stroke-width="7"/>
+<!-- horns -->
+<path d="M557 202 Q502 156 516 100 Q550 130 575 164 M643 202 Q698 156 684 100 Q650 130 625 164" fill="none" stroke="#8e6b47" stroke-width="11" stroke-linecap="round"/>
+<!-- eyes -->
+<path d="M545 300 Q568 282 584 301 Q567 314 546 305 M655 300 Q632 282 616 301 Q633 314 654 305" fill="#d6a245" opacity=".95"/>
+<!-- snout / teeth -->
+<path d="M545 340 Q600 314 655 340 Q600 378 545 340Z" fill="#100907" stroke="#713024" stroke-width="6"/>
+<path d="M568 350 L577 369 L587 351 L597 370 L607 351 L617 369 L628 350" fill="none" stroke="#d6c2a0" stroke-width="4"/>
+<!-- fire breath -->
+<path d="M600 378 C560 410 555 432 502 463 C555 455 600 478 656 456 C625 438 635 410 600 378Z" fill="url(#fire)" opacity=".9"/>
+<circle cx="600" cy="437" r="62" fill="url(#fire)" filter="url(#glow)"/>
+<!-- particles -->
+<g fill="#d99b4c"><circle cx="106" cy="430" r="2"/><circle cx="172" cy="286" r="2"/><circle cx="940" cy="365" r="2"/><circle cx="1038" cy="440" r="2"/><circle cx="840" cy="120" r="1.8"/></g>
+</svg>

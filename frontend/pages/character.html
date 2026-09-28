@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ru" data-cf-final="1">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{{ page_meta.title }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/app.css?v=141.0">
+  <link rel="stylesheet" href="/static/css/stage14-portraits.css?v=141.1">
+  <link rel="stylesheet" href="/static/css/stage10-workbench.css?v=141.0">
+  {% include "components/seo.html" %}
+</head>
+<body class="character-profile-page" data-character-slug="{{ character.slug }}">
+{% include "components/header.html" %}
+<main class="cf10-character-page">
+  <div class="cf10-character-shell">
+    <a class="cf10-back" href="/characters">← К ХРОНИКАМ ПЕРСОНАЖЕЙ</a>
+
+    <section class="cf10-character-hero">
+      <div class="cf10-character-art">
+        <img
+          src="{{ character.image }}?v=1520"
+          data-portrait-source="{{ character.image }}?v=1520"
+          alt="{{ character.name }}"
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
+        >
+        <div class="cf14-portrait-status" hidden aria-live="polite">
+          <div class="cf14-portrait-status__inner">
+            <span class="cf14-portrait-status__mark" aria-hidden="true">✦</span>
+            <span class="cf14-portrait-status__text">ЗАГРУЗКА ПОРТРЕТА</span>
+          </div>
+        </div>
+      </div>
+      <div class="cf10-character-copy">
+        <span class="cf-v7-kicker">{{ character.house }}</span>
+        <h1>{{ character.name }}</h1>
+        <p class="cf10-character-summary">{{ character.summary }}</p>
+        <div class="cf10-character-actions">
+          <a class="cf-v7-btn cf-v7-btn--gold" href="/search?mode=search&q={{ character.query|urlencode }}">НАЙТИ СЦЕНЫ</a>
+          <a class="cf-v7-btn" href="/search?mode=idea&q={{ character.query|urlencode }}">ИДЕЯ ДЛЯ ЭДИТА</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="cf10-character-columns">
+      <article class="cf10-lore-panel">
+        <span class="cf-v7-kicker">ХРОНИКИ ПЕРСОНАЖА</span>
+        <h2>Лор и монтажный язык</h2>
+        <div class="cf10-lore-list">
+          {% for item in character.lore %}
+          <p><span>✦</span>{{ item }}</p>
+          {% endfor %}
+        </div>
+      </article>
+      <aside class="cf10-profile-panel">
+        <span class="cf-v7-kicker">РЕКОМЕНДУЕМЫЙ ПРОФИЛЬ ЭДИТА</span>
+        <div class="cf10-tag-list">
+          {% for tag in character.edit_profile %}<span>{{ tag }}</span>{% endfor %}
+        </div>
+        <p>Эти направления используются как стартовые подсказки. Финальная выдача всё равно сортируется backend по Edit Suitability.</p>
+      </aside>
+    </section>
+
+    <section class="cf10-materials" data-character-query="{{ character.query }}">
+      <div class="cf10-section-head">
+        <div>
+          <span class="cf-v7-kicker">РЕАЛЬНЫЕ МАТЕРИАЛЫ</span>
+          <h2>Лучшие сцены из текущего архива</h2>
+        </div>
+        <span id="cf10MaterialsStatus" class="cf-new-meta">Загрузка…</span>
+      </div>
+      <div id="cf10CharacterResults" class="cf10-video-grid" aria-live="polite"></div>
+      <div id="cf10CharacterEmpty" class="cf10-empty" hidden>
+        <strong>В локальном архиве пока нет материалов.</strong>
+        <span>Открой поиск персонажа — найденные реальные результаты будут попадать в этот профиль автоматически.</span>
+        <a class="cf-v7-btn" href="/search?mode=search&q={{ character.query|urlencode }}">ОТКРЫТЬ ПОИСК</a>
+      </div>
+    </section>
+  </div>
+</main>
+{% include "components/footer.html" %}
+<script src="/static/js/site.js?v=7.5"></script>
+<script src="/static/js/final-v6.js?v=60.0"></script>
+<script src="/static/js/final-v7.js?v=70.0"></script>
+<script src="/static/js/stage10-characters.js?v=101.0" defer></script>
+<script src="/static/js/stage5-atmosphere.js?v=80.0" defer></script>
+<script src="/static/js/stage14-portraits.js?v=141.1" defer></script>
+</body>
+</html>

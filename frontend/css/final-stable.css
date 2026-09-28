@@ -1,0 +1,74 @@
+/* CLIPFENDER FINAL STABLE LAYER
+   Purpose: remove cascading conflicts from earlier visual passes without
+   touching existing business logic. The reference system stays the visual source.
+*/
+:root{
+  --cf-stable-header-h:70px;
+  --cf-stable-gold:#C89B3C;
+  --cf-stable-gold-hi:#E0B86A;
+  --cf-stable-bronze:#8B6D3A;
+  --cf-stable-bg:#0B0C0F;
+  --cf-stable-panel:#121316;
+  --cf-stable-line:#3E3A34;
+  --cf-stable-ease:cubic-bezier(.4,0,.2,1);
+}
+html,body{margin:0!important;min-height:100%;overflow-x:hidden}
+body{padding-top:0!important;background:var(--cf-stable-bg)!important}
+/* The header is fixed and overlays the hero, as in the reference. */
+.cf2-header{position:fixed!important;top:0!important;left:0!important;right:0!important;z-index:1200!important;height:auto!important}
+/* remove the accidental blank band under the fixed header */
+body.home-page .home-stage3{margin-top:0!important;min-height:100svh!important}
+body.home-page .home-stage3__center{padding-top:118px!important}
+/* page-based screens already have their own top rhythm */
+main>.page-hero,.cf-new-page{padding-top:110px!important}
+body.cf4-active .container{padding-top:74px!important}
+body.cf4-active .hero{margin-top:0!important}
+/* Keep legacy content, but do not let obsolete global ornaments cover it. */
+.home-stage3__ornament,.hero-ornament,.home-stage3__feature:before,.page-hero:before,.page-hero:after{display:none!important}
+/* Crisp vector scenes: never use the old screenshot-derived backgrounds. */
+body.home-page .home-stage3__scene{
+  background-image:url('/static/assets/reference/final/cf-home-scene.svg')!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  background-size:cover!important;
+  filter:none!important;
+  opacity:1!important;
+}
+body.characters-page .page-hero,
+body[data-page='characters'] .page-hero{background-image:linear-gradient(180deg,rgba(3,6,8,.32),rgba(3,6,8,.92)),url('/static/assets/reference/final/cf-hall-scene.svg')!important;background-position:center!important;background-size:cover!important}
+body.help-page .page-hero,
+body[data-page='help'] .page-hero{background-image:linear-gradient(180deg,rgba(3,6,8,.32),rgba(3,6,8,.92)),url('/static/assets/reference/final/cf-hall-scene.svg')!important;background-position:center!important;background-size:cover!important}
+body.project-page .page-hero,
+body[data-page='project'] .page-hero{background-image:linear-gradient(180deg,rgba(3,6,8,.26),rgba(3,6,8,.94)),url('/static/assets/reference/final/cf-map.svg')!important;background-position:center!important;background-size:cover!important}
+body.about-page .page-hero,
+body[data-page='about'] .page-hero{background-image:linear-gradient(180deg,rgba(3,6,8,.26),rgba(3,6,8,.94)),url('/static/assets/reference/final/cf-map.svg')!important;background-position:center!important;background-size:cover!important}
+body.login-page .page-hero,
+body[data-page='login'] .page-hero{background-image:linear-gradient(180deg,rgba(3,6,8,.30),rgba(3,6,8,.94)),url('/static/assets/reference/final/cf-hall-scene.svg')!important;background-position:center!important;background-size:cover!important}
+body.error-page .page-hero,
+body[data-page='404'] .page-hero{background-image:linear-gradient(180deg,rgba(3,6,8,.28),rgba(3,6,8,.96)),url('/static/assets/reference/final/cf-404-scene.svg')!important;background-position:center!important;background-size:cover!important}
+/* Compact, reference-like page rhythm */
+.page-hero{min-height:390px!important}
+.cf-new-page{min-height:calc(100svh - var(--cf-stable-header-h))!important;padding:96px 4% 64px!important}
+/* Remove accidental giant top margins caused by previous page layers. */
+.home-stage3__below{padding-top:72px!important}
+/* Crisp image treatment for real portraits and video thumbnails. */
+img{image-rendering:auto}
+.character-portrait-rich,.thumbnail,.work-thumb-rich,.work-thumb{filter:none!important}
+/* Keep panels sharp and readable. */
+.home-stage3__feature,.character-card-rich,.work-card-rich,.help-tool-card,.idea-card,.video-card,.project-card-large,.featured-project-rich,.contact-form-rich,.contact-chronicle,.review,.auth-card,.faq-item-rich{backdrop-filter:none!important}
+/* Do not let global animation layers change the document flow. */
+.cf-final-atmosphere{z-index:0!important}
+.cf2-header,.cf2-footer,main{position:relative}
+main{z-index:2}
+.cf2-header{position:fixed!important}
+/* Archive filter modal stays above everything. */
+.cf4-modal{z-index:2500!important}
+.modal,.cf5-help-modal{z-index:2400!important}
+/* Page transition should never block clicks after navigation begins. */
+#page-transition,.cf-transition,.cfx-page-transition{pointer-events:none!important}
+@media(max-width:760px){
+  body.home-page .home-stage3__center{padding-top:100px!important}
+  main>.page-hero,.cf-new-page{padding-top:92px!important}
+  body.cf4-active .container{padding-top:62px!important}
+}
+@media(prefers-reduced-motion:reduce){.home-stage3__scene{animation:none!important}}
