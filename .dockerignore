@@ -17,3 +17,9 @@ tests/
 *.log
 .DS_Store
 Thumbs.db
+# Never ship deployment archives or local backup history into the image
+_archive/stage*/
+_backup/stage*/
+*.zip
+*.zip.sha256
+.env

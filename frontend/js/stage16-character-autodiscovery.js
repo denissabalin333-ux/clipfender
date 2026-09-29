@@ -16,13 +16,7 @@
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     };
-    let token = readCookie('cf_csrf');
-    if (!token) {
-      try {
-        const csrfResponse = await fetch('/api/auth/csrf', { credentials: 'same-origin', headers: { 'Accept': 'application/json' } });
-        if (csrfResponse.ok) token = readCookie('cf_csrf');
-      } catch (_) {}
-    }
+    const token = readCookie('cf_csrf');
     if (token) headers['X-CSRF-Token'] = token;
 
     try {

@@ -9,11 +9,8 @@ import time
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from argon2 import PasswordHasher
-from argon2.exceptions import HashingError
 from fastapi import HTTPException, Request
 
-from backend.config import APP_ENV, TRUST_PROXY_HEADERS
 from backend.database.database import get_connection
 
 SESSION_COOKIE = "cf_session"
@@ -43,55 +40,8 @@ def require_admin(request: Request) -> dict:
     return user
 
 
-def ensure_bootstrap_admin() -> int:
-    """Create missing allowlisted admin accounts from a startup-only secret.
-
-    Public registration deliberately blocks ADMIN_EMAILS addresses. This function
-    provides the owner a safe first-deploy path without exposing a bootstrap HTTP endpoint.
-    Existing users are never overwritten.
-    Returns the number of accounts created.
-    """
-    emails = sorted(admin_emails())
-    password = os.getenv("ADMIN_BOOTSTRAP_PASSWORD", "")
-    if not emails or not password:
-        return 0
-    if len(password) < 12 or len(password) > 128:
-        raise RuntimeError("ADMIN_BOOTSTRAP_PASSWORD must contain 12 to 128 characters")
-
-    name = " ".join(os.getenv("ADMIN_BOOTSTRAP_NAME", "ClipFender Admin").strip().split()) or "ClipFender Admin"
-    hasher = PasswordHasher()
-    created = 0
-    connection = get_connection()
-    try:
-        for email in emails:
-            existing = connection.execute(
-                "SELECT id FROM users WHERE email = ? COLLATE NOCASE LIMIT 1",
-                (email,),
-            ).fetchone()
-            if existing:
-                continue
-            try:
-                password_hash = hasher.hash(password)
-            except HashingError as exc:
-                raise RuntimeError("Unable to hash bootstrap admin password") from exc
-            connection.execute(
-                "INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)",
-                (name, email, password_hash),
-            )
-            created += 1
-        connection.commit()
-    finally:
-        connection.close()
-    return created
-
-
 def is_https(request: Request) -> bool:
-    if request.url.scheme == "https":
-        return True
-    if TRUST_PROXY_HEADERS and (APP_ENV == "production" or os.getenv("RENDER", "").strip().lower() == "true"):
-        forwarded = request.headers.get("x-forwarded-proto", "")
-        return forwarded.split(",", 1)[0].strip().lower() == "https"
-    return False
+    return request.url.scheme == "https"
 
 
 def new_token(size: int = 32) -> str:
@@ -103,15 +53,6 @@ def token_hash(token: str) -> str:
 
 
 def client_ip(request: Request) -> str:
-    if TRUST_PROXY_HEADERS and (APP_ENV == "production" or os.getenv("RENDER", "").strip().lower() == "true"):
-        forwarded = request.headers.get("x-forwarded-for", "")
-        if forwarded:
-            first = forwarded.split(",", 1)[0].strip()
-            if first:
-                return first
-        real_ip = request.headers.get("x-real-ip", "").strip()
-        if real_ip:
-            return real_ip
     return (request.client.host if request.client else None) or "unknown"
 
 

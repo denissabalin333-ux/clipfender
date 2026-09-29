@@ -25,10 +25,8 @@ node_modules/
 Thumbs.db
 .vscode/
 .idea/
-
-# Release/build artifacts and internal maintenance snapshots
-_backup/
-_archive/
-evidence/
+# Deployment/private artifacts
+/_archive/stage*/
+/_backup/stage*/
 *.zip
-*.sha256
+*.zip.sha256

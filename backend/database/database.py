@@ -3,7 +3,7 @@ import time
 import sqlite3
 from pathlib import Path
 
-from backend.config import BASE_DIR
+from dotenv import load_dotenv
 
 
 # ============================================================
@@ -12,7 +12,12 @@ from backend.config import BASE_DIR
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
+load_dotenv(BASE_DIR / ".env")
+
 DATABASE_PATH = Path(os.getenv("CLIPFINDER_DB_PATH", str(BASE_DIR / "clipfinder.db"))).resolve()
+TURSO_DATABASE_URL = os.getenv("TURSO_DATABASE_URL", "").strip()
+TURSO_AUTH_TOKEN = os.getenv("TURSO_AUTH_TOKEN", "").strip()
+REMOTE_DATABASE_ENABLED = bool(TURSO_DATABASE_URL)
 
 
 # ============================================================
@@ -20,6 +25,10 @@ DATABASE_PATH = Path(os.getenv("CLIPFINDER_DB_PATH", str(BASE_DIR / "clipfinder.
 # ============================================================
 
 def get_connection():
+
+    if REMOTE_DATABASE_ENABLED:
+        from backend.database.remote import connect_remote
+        return connect_remote(TURSO_DATABASE_URL, TURSO_AUTH_TOKEN)
 
     connection = sqlite3.connect(
         DATABASE_PATH,
@@ -299,6 +308,23 @@ def init_database():
         )
         """
     )
+
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS character_portrait_assets (
+            slug TEXT PRIMARY KEY,
+            mime_type TEXT NOT NULL DEFAULT 'image/webp',
+            image_data BLOB NOT NULL,
+            source_type TEXT NOT NULL DEFAULT 'unknown',
+            source_url TEXT NOT NULL DEFAULT '',
+            sha256 TEXT NOT NULL DEFAULT '',
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(slug) REFERENCES character_catalog(slug) ON DELETE CASCADE
+        )
+        """
+    )
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_character_portrait_assets_updated ON character_portrait_assets(updated_at)")
 
     cursor.execute(
         """

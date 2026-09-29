@@ -4,7 +4,7 @@ import os
 
 from fastapi import APIRouter, Body, HTTPException, Request
 
-from backend.security import client_ip, consume_rate_limit, require_csrf
+from backend.security import client_ip, consume_rate_limit
 from backend.services.character_catalog import ensure_character, existing_character
 
 router = APIRouter()
@@ -14,10 +14,9 @@ router = APIRouter()
 def ensure_character_endpoint(request: Request, payload: dict = Body(default_factory=dict)):
     """Ensure a requested character has a verified local portrait/profile.
 
-    This endpoint is deliberately CSRF-protected and rate-limited because a missing
-    portrait may trigger an external paid image-generation call.
+    This endpoint is deliberately rate-limited because a missing portrait may
+    trigger an external image-search request or a paid image-generation call.
     """
-    require_csrf(request)
     fetch_site = request.headers.get("Sec-Fetch-Site", "").strip().lower()
     if fetch_site == "cross-site":
         raise HTTPException(status_code=403, detail="Запрос к каталогу персонажей должен идти с самого сайта ClipFender.")

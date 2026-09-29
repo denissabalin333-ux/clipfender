@@ -12,7 +12,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 RUN useradd --create-home --shell /usr/sbin/nologin appuser \
-    && mkdir -p /var/lib/clipfender /app/data /app/data/characters \
+    && mkdir -p /var/lib/clipfender /app/data \
     && chown -R appuser:appuser /app /var/lib/clipfender
 
 USER appuser

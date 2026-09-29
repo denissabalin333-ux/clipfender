@@ -1,6 +1,9 @@
-CLIPFENDER FINAL PUBLIC RELEASE
+CLIPFENDER FINAL PUBLIC RELEASE — RENDER FREE + TURSO
 
-Canonical project folder: ClipFender_FINAL_PUBLIC_RELEASE
+Canonical deployment:
+  Render Free web service (FastAPI)
+  Turso Cloud for persistent SQLite-compatible production storage
+  Generated character portraits stored as BLOBs in Turso
 
 Launch locally:
   Git Bash: ./start_git_bash.sh
@@ -11,21 +14,31 @@ Docker:
   start_docker.bat
 
 Production:
-  Render uses render.yaml with a persistent disk for SQLite and dynamic character portraits.
-  See PUBLIC_RELEASE_FINAL.md for the exact deployment sequence.
+  Use render.yaml. No Render Persistent Disk is required.
+  Set TURSO_DATABASE_URL and TURSO_AUTH_TOKEN in Render.
 
 Secrets:
-  Local: copy .env.example -> .env.
-  Production: set secrets in Render Environment Variables.
-  Required for full production: YOUTUBE_API_KEY, OPENAI_API_KEY, ADMIN_EMAILS, ADMIN_BOOTSTRAP_PASSWORD, ALLOWED_ORIGINS, PUBLIC_BASE_URL.
-  Never commit .env.
+  Never commit .env. Use Render Environment Variables in production.
 
-Important:
-  Do not use global `python -m uvicorn ...` before activating/installing the project venv.
+Required production secrets:
+  YOUTUBE_API_KEY
+  TURSO_DATABASE_URL
+  TURSO_AUTH_TOKEN
+  ALLOWED_ORIGINS
+  PUBLIC_BASE_URL
+  ADMIN_EMAILS
+  ADMIN_BOOTSTRAP_PASSWORD (remove after first successful bootstrap)
+  OPENAI_API_KEY (required for automatic character portrait generation)
 
 Release checks:
-  Automated test suite PASS
+  pytest PASS
   Python compile PASS
   JS syntax PASS
-  Production configuration smoke PASS
+  deployment config PASS
+  secret scan PASS
   DB SHA-256 unchanged
+
+See:
+  DEPLOY_FREE_TURSO.md
+  PUBLIC_RELEASE_FINAL.md
+  CHANGES_FREE_RENDER.md

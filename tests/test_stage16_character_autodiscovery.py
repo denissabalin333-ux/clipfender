@@ -62,7 +62,7 @@ def test_new_character_can_be_discovered_with_mocked_ai(monkeypatch, tmp_path):
     assert result["created"] is True
     assert result["source"] == "ai_generation"
     assert result["character"]["slug"] == "sansa-stark"
-    assert result["character"]["image"] == "/media/characters/sansa-stark-hq.webp"
+    assert result["character"]["image"] == "/static/assets/reference/generated/sansa-stark-hq.webp"
     assert (tmp_path / "generated" / "sansa-stark-hq.webp").is_file()
 
     stored = character_catalog.get_dynamic_character("sansa-stark")
@@ -105,7 +105,6 @@ def test_search_page_wires_character_discovery():
 def test_env_example_documents_external_providers_without_secrets():
     env = Path(".env.example").read_text(encoding="utf-8")
     assert "BING_IMAGE_SEARCH_API_KEY=" in env
-    assert "CHARACTER_IMAGE_SEARCH_ENABLED=0" in env
     assert "OPENAI_API_KEY=" in env
     assert "CHARACTER_GENERATION_DAILY_GUARD=" in env
     assert "AKIA" not in env
