@@ -1,5 +1,32 @@
 # ClipFender — публичный деплой и release checklist
 
+
+## 0A. Final production character catalog storage
+
+Dynamic character portraits are stored outside the source tree:
+
+```text
+CHARACTER_STORAGE_DIR=/var/lib/clipfender/characters
+```
+
+The Render persistent disk is mounted at `/var/lib/clipfender`, so both SQLite and generated portraits survive restarts/redeploys. Render documents that only data written under the disk mount path persists; a paid web service is required for a persistent disk.
+
+The old Bing Image Search path is intentionally disabled because the Bing Search APIs were retired. Production uses the OpenAI image-generation fallback for new portraits when `OPENAI_API_KEY` is configured.
+
+## 0B. Required Render secrets
+
+Set these in the Render Dashboard as secret environment variables (never commit them):
+
+```text
+YOUTUBE_API_KEY=...
+OPENAI_API_KEY=...
+ADMIN_EMAILS=you@example.com
+ALLOWED_ORIGINS=https://your-real-domain.example
+PUBLIC_BASE_URL=https://your-real-domain.example
+```
+
+The application returns HTTP 503 from `/health` in production when any required value is missing or when the image-generation feature is enabled without `OPENAI_API_KEY`. This intentionally prevents a deployment from being considered healthy while a required production dependency is absent.
+
 ## 1. Canonical production configuration
 
 Минимальный набор:
@@ -15,13 +42,13 @@ PUBLIC_BASE_URL=https://your-domain.example
 
 `PUBLIC_BASE_URL` нужен для canonical URL, Open Graph, sitemap и `security.txt`.
 
-## 2. Production datastore / Render Free
+## 2. SQLite / Render
 
-Текущий production-профиль Render Free не использует Persistent Disk и не зависит от локального SQLite-файла. Render Free имеет эфемерную файловую систему, поэтому `clipfinder.db` и пользовательские generated files нельзя считать постоянными.
+Текущий проект хранит search cache, quota state, пользователей, сессии, библиотеку, contact messages и rate-limit state в SQLite.
 
-При заданных `TURSO_DATABASE_URL` и `TURSO_AUTH_TOKEN` приложение переключается на Turso через SQLite-совместимый remote DB-API. Динамические character portraits сохраняются как BLOB в `character_portrait_assets`, поэтому они также переживают restart/redeploy.
+В текущем `render.yaml` Persistent Disk уже описан: `/var/lib/clipfender`, 1 GB, а приложение получает `CLIPFINDER_DB_PATH=/var/lib/clipfender/clipfinder.db`. Без постоянного диска Render использует эфемерную файловую систему, и SQLite может исчезнуть после redeploy/restart. Для нескольких инстансов вместо SQLite используйте PostgreSQL.
 
-Локальный `clipfinder.db` остаётся рабочим fallback для разработки. Публичные API-контракты не меняются.
+Для нескольких независимых инстансов/горизонтального масштабирования предпочтителен PostgreSQL. Публичные API при миграции должны остаться без изменений.
 
 ## 3. YouTube API compliance
 
@@ -150,7 +177,7 @@ Workflow:
 1. `PUBLIC_BASE_URL` совпадает с реальным HTTPS доменом.
 2. `ALLOWED_ORIGINS` не содержит `*`.
 3. YouTube API key находится только в secret/environment.
-4. `TURSO_DATABASE_URL` и `TURSO_AUTH_TOKEN` заданы для production; Render Persistent Disk для Render Free не используется.
+4. Render Persistent Disk включён для SQLite или выполнена миграция на PostgreSQL.
 5. `/health` возвращает `200`.
 6. `/sitemap.xml`, `/robots.txt`, `/privacy`, `/terms`, `/copyright` доступны.
 7. Registration/login/logout работают.
@@ -160,3 +187,16 @@ Workflow:
 11. Embedded player открывается через официальный YouTube player без overlay над player controls.
 12. CI зелёный.
 13. Подтверждена compliance-проверка YouTube API Services перед публичным запуском.
+
+
+## 11. First production deployment — exact order
+
+1. Push the repository to GitHub without `.env` or database files.
+2. In Render create a Blueprint from `render.yaml`.
+3. Make sure the web service has the Persistent Disk mounted at `/var/lib/clipfender`. A Render persistent disk preserves only files written under that mount path and requires a paid service.
+4. Set `YOUTUBE_API_KEY`, `OPENAI_API_KEY`, `ADMIN_EMAILS`, `ADMIN_BOOTSTRAP_PASSWORD`, `ALLOWED_ORIGINS`, and `PUBLIC_BASE_URL` in Render Environment Variables. Never put real secrets in `render.yaml` or Git.
+5. Keep `CHARACTER_IMAGE_SEARCH_ENABLED=0`; the legacy Bing Image Search integration is disabled.
+6. Deploy and open `/health`. It must return HTTP 200 with `status=ok`.
+7. Log in using the allowlisted admin email and the bootstrap password. Once the account exists, remove `ADMIN_BOOTSTRAP_PASSWORD` from Render.
+8. Run one real YouTube search and one new-character discovery. Confirm the portrait URL is under `/media/characters/` and remains available after a restart.
+9. Only after these checks point the domain DNS at the Render service.

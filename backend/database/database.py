@@ -3,7 +3,7 @@ import time
 import sqlite3
 from pathlib import Path
 
-from dotenv import load_dotenv
+from backend.config import BASE_DIR
 
 
 # ============================================================
@@ -12,12 +12,7 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-load_dotenv(BASE_DIR / ".env")
-
 DATABASE_PATH = Path(os.getenv("CLIPFINDER_DB_PATH", str(BASE_DIR / "clipfinder.db"))).resolve()
-TURSO_DATABASE_URL = os.getenv("TURSO_DATABASE_URL", "").strip()
-TURSO_AUTH_TOKEN = os.getenv("TURSO_AUTH_TOKEN", "").strip()
-REMOTE_DATABASE_ENABLED = bool(TURSO_DATABASE_URL)
 
 
 # ============================================================
@@ -25,10 +20,6 @@ REMOTE_DATABASE_ENABLED = bool(TURSO_DATABASE_URL)
 # ============================================================
 
 def get_connection():
-
-    if REMOTE_DATABASE_ENABLED:
-        from backend.database.remote import connect_remote
-        return connect_remote(TURSO_DATABASE_URL, TURSO_AUTH_TOKEN)
 
     connection = sqlite3.connect(
         DATABASE_PATH,
@@ -134,6 +125,40 @@ def init_database():
         """
     )
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)")
+
+    # Legacy databases may have a users table created before the UNIQUE email
+    # constraint was introduced.  These triggers do not remove existing rows;
+    # they simply prevent any further duplicate normalized email from being
+    # inserted or assigned during an update.
+    cursor.execute(
+        """
+        CREATE TRIGGER IF NOT EXISTS trg_users_email_unique_insert
+        BEFORE INSERT ON users
+        FOR EACH ROW
+        WHEN EXISTS (
+            SELECT 1 FROM users
+            WHERE lower(trim(email)) = lower(trim(NEW.email))
+        )
+        BEGIN
+            SELECT RAISE(ABORT, 'duplicate_user_email');
+        END
+        """
+    )
+    cursor.execute(
+        """
+        CREATE TRIGGER IF NOT EXISTS trg_users_email_unique_update
+        BEFORE UPDATE OF email ON users
+        FOR EACH ROW
+        WHEN EXISTS (
+            SELECT 1 FROM users
+            WHERE id <> NEW.id
+              AND lower(trim(email)) = lower(trim(NEW.email))
+        )
+        BEGIN
+            SELECT RAISE(ABORT, 'duplicate_user_email');
+        END
+        """
+    )
 
     cursor.execute(
         """
@@ -308,23 +333,6 @@ def init_database():
         )
         """
     )
-
-    cursor.execute(
-        """
-        CREATE TABLE IF NOT EXISTS character_portrait_assets (
-            slug TEXT PRIMARY KEY,
-            mime_type TEXT NOT NULL DEFAULT 'image/webp',
-            image_data BLOB NOT NULL,
-            source_type TEXT NOT NULL DEFAULT 'unknown',
-            source_url TEXT NOT NULL DEFAULT '',
-            sha256 TEXT NOT NULL DEFAULT '',
-            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-            updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY(slug) REFERENCES character_catalog(slug) ON DELETE CASCADE
-        )
-        """
-    )
-    cursor.execute("CREATE INDEX IF NOT EXISTS idx_character_portrait_assets_updated ON character_portrait_assets(updated_at)")
 
     cursor.execute(
         """

@@ -14,16 +14,19 @@ from urllib.parse import urlparse
 import httpx
 from PIL import Image, ImageFilter, ImageStat
 
+from backend.config import APP_ENV, BASE_DIR
 from backend.character_profiles import CHARACTER_PROFILES
-from backend.database.database import REMOTE_DATABASE_ENABLED, get_connection
+from backend.database.database import get_connection
 
 logger = logging.getLogger("clipfender.character_catalog")
 
-BASE_DIR = Path(__file__).resolve().parents[2]
 FRONTEND_DIR = BASE_DIR / "frontend"
-GENERATED_DIR = FRONTEND_DIR / "assets" / "reference" / "generated"
+DEFAULT_CHARACTER_STORAGE = Path("/var/lib/clipfender/characters") if APP_ENV == "production" else (BASE_DIR / "data" / "characters")
+GENERATED_DIR = Path(os.getenv("CHARACTER_STORAGE_DIR", str(DEFAULT_CHARACTER_STORAGE))).expanduser().resolve()
 
-IMAGE_SEARCH_ENABLED = os.getenv("CHARACTER_IMAGE_SEARCH_ENABLED", "0").strip().lower() not in {"0", "false", "no", "off"}
+# Bing Image Search is retired. The legacy implementation is preserved below for archive/history
+# compatibility but is permanently disabled in the active production pipeline.
+IMAGE_SEARCH_ENABLED = False
 IMAGE_SEARCH_API_KEY = os.getenv("BING_IMAGE_SEARCH_API_KEY", "").strip()
 IMAGE_SEARCH_ENDPOINT = os.getenv(
     "BING_IMAGE_SEARCH_ENDPOINT",
@@ -146,8 +149,8 @@ def _hints_for(name: str) -> dict[str, Any]:
 def _summary_for(name: str, hints: dict[str, Any]) -> str:
     house = str(hints.get("house") or "").strip()
     if house and not house.startswith("ПРОФИЛЬ НЕ УКАЗАН"):
-        return f"Автоматически добавленный профиль персонажа {name}. Принадлежность: {house}. Портрет получен через настроенный источник ClipFender и сохранён в защищённом хранилище ClipFender для следующих запросов."
-    return f"Автоматически добавленный профиль персонажа {name}. Портрет получен через настроенный источник ClipFender и сохранён в защищённом хранилище ClipFender для следующих запросов."
+        return f"Автоматически добавленный профиль персонажа {name}. Принадлежность: {house}. Портрет получен через настроенный источник ClipFender и сохранён локально для следующих запросов."
+    return f"Автоматически добавленный профиль персонажа {name}. Портрет получен через настроенный источник ClipFender и сохранён локально для следующих запросов."
 
 
 def _build_profile(name: str, image_path: str, source_type: str, source_url: str = "") -> dict[str, Any]:
@@ -173,6 +176,61 @@ def _build_profile(name: str, image_path: str, source_type: str, source_url: str
     }
 
 
+def character_media_public_path(slug: str) -> str:
+    return f"/media/characters/{slug}-hq.webp"
+
+
+def resolve_character_image_path(image_url: str) -> Path | None:
+    """Resolve a character portrait URL to a file without allowing path traversal."""
+    value = str(image_url or "").strip()
+    if value.startswith("/static/"):
+        candidate = (FRONTEND_DIR / value.removeprefix("/static/")).resolve()
+        root = FRONTEND_DIR.resolve()
+    elif value.startswith("/media/characters/"):
+        filename = Path(value.removeprefix("/media/characters/")).name
+        if filename != value.removeprefix("/media/characters/") or not filename.endswith("-hq.webp"):
+            return None
+        candidate = (GENERATED_DIR / filename).resolve()
+        root = GENERATED_DIR.resolve()
+    else:
+        return None
+    if root not in candidate.parents:
+        return None
+    return candidate
+
+
+def migrate_legacy_generated_portraits() -> int:
+    """Copy any legacy generated portraits into persistent storage and update DB URLs."""
+    old_dir = FRONTEND_DIR / "assets" / "reference" / "generated"
+    if not old_dir.is_dir() or old_dir.resolve() == GENERATED_DIR.resolve():
+        return 0
+    GENERATED_DIR.mkdir(parents=True, exist_ok=True)
+    connection = get_connection()
+    migrated = 0
+    try:
+        rows = connection.execute("SELECT slug, image FROM character_catalog WHERE status = 'ready'").fetchall()
+        for row in rows:
+            image = str(row["image"] or "")
+            if not image.startswith("/static/assets/reference/generated/"):
+                continue
+            filename = Path(image).name
+            source = (old_dir / filename).resolve()
+            target = (GENERATED_DIR / filename).resolve()
+            if old_dir.resolve() not in source.parents or not source.is_file():
+                continue
+            if not target.exists():
+                target.write_bytes(source.read_bytes())
+            connection.execute(
+                "UPDATE character_catalog SET image = ?, updated_at = CURRENT_TIMESTAMP WHERE slug = ?",
+                (character_media_public_path(str(row["slug"])), str(row["slug"])),
+            )
+            migrated += 1
+        connection.commit()
+    finally:
+        connection.close()
+    return migrated
+
+
 def get_dynamic_character(slug: str) -> dict[str, Any] | None:
     clean_slug = slugify(slug)
     connection = get_connection()
@@ -183,7 +241,11 @@ def get_dynamic_character(slug: str) -> dict[str, Any] | None:
         ).fetchone()
         if not row:
             return None
-        return _row_to_profile(row)
+        profile = _row_to_profile(row)
+        asset_path = resolve_character_image_path(profile["image"])
+        if asset_path is None or not asset_path.is_file():
+            return None
+        return profile
     finally:
         connection.close()
 
@@ -471,12 +533,9 @@ def _mark_discovery_error(slug: str, message: str = "") -> None:
         connection.close()
 
 
-def _write_profile(profile: dict[str, Any], source_url: str, image_bytes: bytes | None = None) -> None:
-    import hashlib
-
+def _write_profile(profile: dict[str, Any], source_url: str) -> None:
     connection = get_connection()
     try:
-        image_path = profile["image"]
         connection.execute(
             """
             INSERT INTO character_catalog (
@@ -500,33 +559,12 @@ def _write_profile(profile: dict[str, Any], source_url: str, image_bytes: bytes 
                 updated_at=CURRENT_TIMESTAMP
             """,
             (
-                profile["slug"], profile["name"], profile["short_name"], profile["house"], profile["query"], image_path,
+                profile["slug"], profile["name"], profile["short_name"], profile["house"], profile["query"], profile["image"],
                 profile["summary"], json.dumps(profile["lore"], ensure_ascii=False), json.dumps(profile["edit_profile"], ensure_ascii=False),
                 profile["portrait_source_type"], source_url,
             ),
         )
-        if REMOTE_DATABASE_ENABLED:
-            if not image_bytes:
-                raise ValueError("portrait-bytes-missing")
-            digest = hashlib.sha256(image_bytes).hexdigest()
-            connection.execute(
-                """
-                INSERT INTO character_portrait_assets (slug, mime_type, image_data, source_type, source_url, sha256, created_at, updated_at)
-                VALUES (?, 'image/webp', ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-                ON CONFLICT(slug) DO UPDATE SET
-                    mime_type=excluded.mime_type,
-                    image_data=excluded.image_data,
-                    source_type=excluded.source_type,
-                    source_url=excluded.source_url,
-                    sha256=excluded.sha256,
-                    updated_at=CURRENT_TIMESTAMP
-                """,
-                (profile["slug"], bytes(image_bytes), profile["portrait_source_type"], source_url, digest),
-            )
         connection.commit()
-    except Exception:
-        connection.rollback()
-        raise
     finally:
         connection.close()
 
@@ -554,13 +592,9 @@ def ensure_character(name: str) -> dict[str, Any]:
 
     slug = slugify(clean_name)
     generated_path = GENERATED_DIR / f"{slug}-hq.webp"
-    public_path = (
-        f"/media/characters/{slug}.webp" if REMOTE_DATABASE_ENABLED
-        else f"/static/assets/reference/generated/{slug}-hq.webp"
-    )
+    public_path = character_media_public_path(slug)
 
-    if not REMOTE_DATABASE_ENABLED:
-        GENERATED_DIR.mkdir(parents=True, exist_ok=True)
+    GENERATED_DIR.mkdir(parents=True, exist_ok=True)
 
     claim = _claim_discovery(slug, clean_name, public_path)
     if claim == "ready":
@@ -574,16 +608,16 @@ def ensure_character(name: str) -> dict[str, Any]:
             "message": "Портрет этого персонажа уже готовится другим запросом. Повтори через несколько секунд.",
         }
 
-    search_candidates = _search_bing(clean_name)
+    # Web search is intentionally disabled because the legacy Bing Image Search API was retired.
+    search_candidates: list[dict[str, Any]] = []
     for candidate in search_candidates:
         normalized = _download_image(candidate["url"])
         if not normalized:
             continue
         raw, meta = normalized
-        if not REMOTE_DATABASE_ENABLED:
-            generated_path.write_bytes(raw)
+        generated_path.write_bytes(raw)
         profile = _build_profile(clean_name, public_path, "web_search", candidate.get("host_page") or candidate["url"])
-        _write_profile(profile, candidate.get("host_page") or candidate["url"], raw)
+        _write_profile(profile, candidate.get("host_page") or candidate["url"])
         return {"status": "ready", "created": True, "source": "web_search", "image_meta": meta, "character": profile}
 
     if IMAGE_GENERATION_ENABLED and OPENAI_API_KEY:
@@ -597,10 +631,9 @@ def ensure_character(name: str) -> dict[str, Any]:
         normalized = _generate_openai(clean_name)
         if normalized:
             raw, meta = normalized
-            if not REMOTE_DATABASE_ENABLED:
-                generated_path.write_bytes(raw)
+            generated_path.write_bytes(raw)
             profile = _build_profile(clean_name, public_path, "ai_generation", "")
-            _write_profile(profile, "", raw)
+            _write_profile(profile, "")
             return {"status": "ready", "created": True, "source": "ai_generation", "image_meta": meta, "character": profile}
 
     _mark_discovery_error(slug, "Не удалось получить качественный портрет.")

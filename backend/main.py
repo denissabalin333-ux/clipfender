@@ -5,19 +5,14 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from urllib.parse import urlparse
 
-from dotenv import load_dotenv
-
-BASE_DIR = Path(__file__).resolve().parents[1]
-FRONTEND_DIR = BASE_DIR / "frontend"
-
-load_dotenv(BASE_DIR / ".env")
-
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+
+from backend.config import APP_ENV, BASE_DIR
 
 from backend.api.search import router as search_router
 from backend.api.video import router as video_router
@@ -29,10 +24,19 @@ from backend.api.reports import router as reports_router
 from backend.api.admin import router as admin_router
 from backend.api.characters import router as characters_api_router
 from backend.character_profiles import CHARACTER_PROFILES, get_character
-from backend.services.character_catalog import get_dynamic_character, list_dynamic_characters, merged_catalog
-from backend.security import require_admin
+from backend.services.character_catalog import (
+    GENERATED_DIR,
+    get_dynamic_character,
+    list_dynamic_characters,
+    merged_catalog,
+    migrate_legacy_generated_portraits,
+    resolve_character_image_path,
+)
+from backend.security import ensure_bootstrap_admin, require_admin
 from backend.database.database import get_connection, init_database, migrate_database, cleanup_cache
 from frontend.page_shell import render_page
+
+FRONTEND_DIR = BASE_DIR / "frontend"
 
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO").upper(),
@@ -40,7 +44,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger("clipfender")
 
-APP_ENV = os.getenv("APP_ENV", "development").strip().lower()
 PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL", "").strip().rstrip("/")
 PLAUSIBLE_DOMAIN = os.getenv("PLAUSIBLE_DOMAIN", "").strip()
 PLAUSIBLE_SCRIPT_URL = os.getenv("PLAUSIBLE_SCRIPT_URL", "https://plausible.io/js/script.js").strip()
@@ -66,6 +69,9 @@ async def lifespan(app: FastAPI):
     logger.info("ClipFinder startup: initializing database")
     init_database()
     migrate_database()
+    GENERATED_DIR.mkdir(parents=True, exist_ok=True)
+    migrate_legacy_generated_portraits()
+    ensure_bootstrap_admin()
     cleanup_cache(24)
     try:
         yield
@@ -153,31 +159,6 @@ if FRONTEND_DIR.exists():
         name="frontend",
     )
 
-    @app.get("/media/characters/{slug}.webp", include_in_schema=False)
-    def dynamic_character_portrait(slug: str):
-        # Generated portraits are stored as BLOBs in Turso when running on a
-        # stateless host such as Render Free. Local development keeps using
-        # the checked-in/generated filesystem path.
-        from fastapi.responses import Response
-        clean_slug = "".join(ch for ch in slug.lower() if ch.isalnum() or ch == "-")[:80]
-        if not clean_slug or clean_slug != slug.removesuffix(".webp").lower():
-            raise StarletteHTTPException(status_code=404, detail="Portrait not found")
-        connection = get_connection()
-        try:
-            row = connection.execute(
-                "SELECT image_data, mime_type FROM character_portrait_assets WHERE slug = ? LIMIT 1",
-                (clean_slug,),
-            ).fetchone()
-        finally:
-            connection.close()
-        if not row:
-            raise StarletteHTTPException(status_code=404, detail="Portrait not found")
-        return Response(
-            content=bytes(row["image_data"]),
-            media_type=str(row["mime_type"] or "image/webp"),
-            headers={"Cache-Control": "public, max-age=3600, must-revalidate"},
-        )
-
     # Compatibility aliases: old cached pages may still request /css/* or /js/*.
     @app.get("/css/{asset_path:path}", include_in_schema=False)
     def css_compat(asset_path: str):
@@ -194,6 +175,22 @@ if FRONTEND_DIR.exists():
         if js_root not in candidate.parents or not candidate.is_file():
             raise StarletteHTTPException(status_code=404, detail="JS asset not found")
         return FileResponse(candidate)
+
+
+@app.get("/media/characters/{filename}", include_in_schema=False)
+def dynamic_character_media(filename: str):
+    # Only serve validated portrait filenames from the persistent character store.
+    if not filename.endswith("-hq.webp") or len(filename) > 120:
+        raise StarletteHTTPException(status_code=404, detail="Character portrait not found")
+    candidate = (GENERATED_DIR / filename).resolve()
+    storage_root = GENERATED_DIR.resolve()
+    if storage_root not in candidate.parents or not candidate.is_file():
+        raise StarletteHTTPException(status_code=404, detail="Character portrait not found")
+    return FileResponse(
+        candidate,
+        media_type="image/webp",
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
 
 
 @app.get("/", include_in_schema=False)
@@ -257,12 +254,9 @@ def _available_character_catalog() -> list[dict]:
     catalog: list[dict] = []
     for profile in merged_catalog():
         image = str(profile.get("image") or "")
-        if not image.startswith("/static/"):
-            logger.warning("Skipping character %s: image path is not a static asset", profile.get("slug"))
-            continue
-        asset_path = FRONTEND_DIR / image.removeprefix("/static/")
-        if not asset_path.is_file():
-            logger.warning("Skipping character %s: portrait missing at %s", profile.get("slug"), asset_path)
+        asset_path = resolve_character_image_path(image)
+        if asset_path is None or not asset_path.is_file():
+            logger.warning("Skipping character %s: portrait missing at %s", profile.get("slug"), image)
             continue
         catalog.append(profile)
     return catalog
@@ -420,13 +414,16 @@ def offline_page():
     return FileResponse(FRONTEND_DIR / "offline.html", media_type="text/html")
 
 
-PUBLIC_SITEMAP_PATHS = [
+PUBLIC_SITEMAP_STATIC_PATHS = [
     "/", "/archive", "/search", "/characters",
     "/guides", "/edit-ideas",
     "/portfolio", "/services", "/about", "/contacts", "/help", "/faq", "/project",
     "/privacy", "/terms", "/copyright",
-] + [
-    f"/characters/{profile['slug']}" for profile in _available_character_catalog()
+]
+# Backward-compatible snapshot constant for existing internal tests/tools.
+# The actual sitemap response is built dynamically so newly discovered characters appear without restart.
+PUBLIC_SITEMAP_PATHS = PUBLIC_SITEMAP_STATIC_PATHS + [
+    f"/characters/{profile['slug']}" for profile in CHARACTER_PROFILES.values()
 ]
 
 
@@ -437,8 +434,11 @@ def _public_origin(request: Request) -> str:
 @app.get("/sitemap.xml", include_in_schema=False)
 def sitemap(request: Request):
     origin = _public_origin(request)
+    paths = list(PUBLIC_SITEMAP_STATIC_PATHS) + [
+        f"/characters/{profile['slug']}" for profile in _available_character_catalog()
+    ]
     urls = "\n".join(
-        f"  <url><loc>{origin}{path}</loc></url>" for path in PUBLIC_SITEMAP_PATHS
+        f"  <url><loc>{origin}{path}</loc></url>" for path in paths
     )
     xml = f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{urls}\n</urlset>\n'
     from fastapi.responses import Response
@@ -487,8 +487,76 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
     return JSONResponse({"detail": "Внутренняя ошибка сервера."}, status_code=500)
 
 
+def _production_config_errors() -> list[str]:
+    if APP_ENV != "production":
+        return []
+
+    errors: list[str] = []
+    required = {
+        "YOUTUBE_API_KEY": os.getenv("YOUTUBE_API_KEY", "").strip(),
+        "ADMIN_EMAILS": os.getenv("ADMIN_EMAILS", "").strip(),
+        "PUBLIC_BASE_URL": os.getenv("PUBLIC_BASE_URL", "").strip(),
+        "ALLOWED_ORIGINS": os.getenv("ALLOWED_ORIGINS", "").strip(),
+    }
+    for key, value in required.items():
+        if not value:
+            errors.append(f"{key} is not configured")
+
+    public_url = required["PUBLIC_BASE_URL"]
+    parsed_public = urlparse(public_url) if public_url else None
+    if public_url and (not parsed_public or parsed_public.scheme != "https" or not parsed_public.netloc):
+        errors.append("PUBLIC_BASE_URL must be an https URL in production")
+
+    origins = [item.strip() for item in required["ALLOWED_ORIGINS"].split(",") if item.strip()]
+    if not origins:
+        errors.append("ALLOWED_ORIGINS must contain at least one origin in production")
+    for origin in origins:
+        parsed = urlparse(origin)
+        if parsed.scheme != "https" or not parsed.netloc:
+            errors.append(f"ALLOWED_ORIGINS contains a non-https origin: {origin}")
+
+    generation_enabled = os.getenv("CHARACTER_IMAGE_GENERATION_ENABLED", "1").strip().lower() not in {"0", "false", "no", "off"}
+    if generation_enabled and not os.getenv("OPENAI_API_KEY", "").strip():
+        errors.append("OPENAI_API_KEY is required while CHARACTER_IMAGE_GENERATION_ENABLED is enabled")
+
+    if not os.getenv("CLIPFINDER_DB_PATH", "").strip():
+        errors.append("CLIPFINDER_DB_PATH must be set for production persistent storage")
+
+    # The owner must either already have an allowlisted account or provide the
+    # startup bootstrap secret on first deployment. No public registration path
+    # can claim an ADMIN_EMAILS address.
+    if required["ADMIN_EMAILS"]:
+        admin_list = [item.strip().lower() for item in required["ADMIN_EMAILS"].split(",") if item.strip()]
+        connection = None
+        try:
+            connection = get_connection()
+            if admin_list:
+                placeholders = ",".join("?" for _ in admin_list)
+                row = connection.execute(
+                    f"SELECT 1 FROM users WHERE lower(email) IN ({placeholders}) LIMIT 1",
+                    admin_list,
+                ).fetchone()
+                if not row and not os.getenv("ADMIN_BOOTSTRAP_PASSWORD", "").strip():
+                    errors.append("No admin account exists for ADMIN_EMAILS and ADMIN_BOOTSTRAP_PASSWORD is not configured")
+        except Exception:
+            # Database health is checked separately below; avoid duplicating a
+            # connection failure into the configuration section.
+            pass
+        finally:
+            if connection is not None:
+                connection.close()
+
+    return errors
+
+
 @app.get("/health")
 def health():
+    config_errors = _production_config_errors()
+    if config_errors:
+        return JSONResponse(
+            {"status": "error", "service": "ClipFinder", "checks": config_errors},
+            status_code=503,
+        )
     try:
         connection = get_connection()
         try:

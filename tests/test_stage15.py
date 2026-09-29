@@ -25,7 +25,7 @@ def test_stage15_archive_app_cache_busted_and_stage15_css_loaded():
     html = (ROOT / "frontend/archive.html").read_text(encoding="utf-8")
     app = (ROOT / "frontend/css/app.css").read_text(encoding="utf-8")
 
-    assert '/static/css/app.css?v=72.0' in html
+    assert '/static/css/app.css?v=73.0' in html
     assert '@import url("./stage15-release.css");' in app
 
 

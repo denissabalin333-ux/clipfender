@@ -221,6 +221,7 @@ document.querySelectorAll('.faq-item button, .faq-item-rich button').forEach(btn
         remember: Boolean(form.querySelector('[name=remember]')?.checked)
       });
       const name = data?.user?.name || 'редактор';
+      try { localStorage.removeItem('clipfinder_last_auth_email'); } catch (_) {}
       window.showToast(`Добро пожаловать, ${name}.`, 'success');
       window.setTimeout(() => { location.href = '/archive'; }, 450);
     } catch (error) {
@@ -237,14 +238,23 @@ document.querySelectorAll('.faq-item button, .faq-item-rich button').forEach(btn
     const button = form.querySelector('button[type="submit"]');
     setBusy(button, true, 'СОЗДАЁМ АККАУНТ…');
     try {
+      const email = form.querySelector('[name=email]')?.value || '';
       const data = await submitJson('/api/auth/register', {
         name: form.querySelector('[name=name]')?.value || '',
-        email: form.querySelector('[name=email]')?.value || '',
+        email,
         password: form.querySelector('[name=password]')?.value || ''
       });
       const name = data?.user?.name || 'редактор';
-      window.showToast(`Аккаунт ${name} создан.`, 'success');
-      window.setTimeout(() => { location.href = '/archive'; }, 450);
+      try { localStorage.setItem('clipfender_last_auth_email', email.trim().toLowerCase()); } catch (_) {}
+      const sessionCheck = await fetch('/api/auth/me', { credentials: 'same-origin', headers: { 'Accept': 'application/json' } });
+      const sessionData = sessionCheck.ok ? await sessionCheck.json().catch(() => null) : null;
+      if (sessionData?.authenticated) {
+        window.showToast(`Аккаунт ${name} создан.`, 'success');
+        window.setTimeout(() => { location.href = '/archive'; }, 350);
+      } else {
+        const target = `/login?email=${encodeURIComponent(email.trim())}&registered=1`;
+        window.location.href = target;
+      }
     } catch (error) {
       window.showToast(error.message || 'Не удалось создать аккаунт.', 'error');
     } finally {
@@ -283,6 +293,21 @@ document.querySelectorAll('.faq-item button, .faq-item-rich button').forEach(btn
     }
     return false;
   };
+
+  const prefillAuthEmail = () => {
+    const loginInput = document.querySelector('.auth-grid input[name="login"]');
+    if (!loginInput || loginInput.value.trim()) return;
+    const params = new URLSearchParams(window.location.search);
+    let email = params.get('email') || '';
+    if (!email) {
+      try { email = localStorage.getItem('clipfinder_last_auth_email') || ''; } catch (_) {}
+    }
+    if (email) loginInput.value = email;
+    const registered = params.get('registered');
+    if (registered === '1') window.showToast?.('Аккаунт создан. Войдите, чтобы продолжить.', 'success');
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', prefillAuthEmail, { once: true });
+  else prefillAuthEmail();
 
   const liveAuthPage = document.querySelector('.auth-grid');
   const liveContactForm = document.querySelector('#form.contact-form-rich');

@@ -159,4 +159,11 @@ YOUTUBE_API_KEY
 
 `.env.example` публиковать можно.
 
-Корневой `clipfinder.db` сохранён из проекта для локальной разработки. Production-профиль Render Free не использует Persistent Disk: при заданных `TURSO_DATABASE_URL` и `TURSO_AUTH_TOKEN` постоянная БД находится в Turso, а динамические портреты хранятся в той же удалённой БД как BLOB. Для Render Free используйте `render.yaml` и `DEPLOY_FREE_TURSO.md`.
+Корневой `clipfinder.db` сохранён из проекта. Для production на Render этот Blueprint уже предусматривает Persistent Disk 1 GB и `CLIPFINDER_DB_PATH=/var/lib/clipfender/clipfinder.db`. Для нескольких инстансов используйте PostgreSQL согласно `DEPLOY_PUBLIC.md`. Администратор задаётся через `ADMIN_EMAILS` в Render Environment.
+
+
+## Production launch
+
+For a public Render deployment, use `render.yaml` from the repository root. Set `YOUTUBE_API_KEY`, `OPENAI_API_KEY`, `ADMIN_EMAILS`, `ALLOWED_ORIGINS`, and `PUBLIC_BASE_URL` as Render environment variables. Keep `APP_ENV=production`. The persistent disk is used for `/var/lib/clipfender`, including SQLite and automatically generated character portraits.
+
+Do not upload `.env` to GitHub or Render source control. Put secrets only in Render Environment Variables/Secrets.

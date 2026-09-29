@@ -88,21 +88,56 @@ def register(payload: RegisterPayload, request: Request):
 
     connection = get_connection()
     try:
-        existing = connection.execute("SELECT id FROM users WHERE email = ? COLLATE NOCASE LIMIT 1", (email,)).fetchone()
+        # Serialize registration writes so two concurrent requests cannot both pass
+        # the duplicate-email check when a legacy database predates the UNIQUE constraint.
+        connection.execute("BEGIN IMMEDIATE")
+        existing = connection.execute(
+            "SELECT id FROM users WHERE lower(trim(email)) = lower(trim(?)) LIMIT 1",
+            (email,),
+        ).fetchone()
         if existing:
+            connection.rollback()
             raise HTTPException(status_code=409, detail="Пользователь с таким email уже существует")
+
         password_hash = password_hasher.hash(password)
-        cursor = connection.execute(
-            "INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)",
-            (name, email, password_hash),
-        )
-        user_id = int(cursor.lastrowid)
+        try:
+            cursor = connection.execute(
+                "INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)",
+                (name, email, password_hash),
+            )
+        except Exception as error:
+            message = str(error).lower()
+            if "unique" in message or "duplicate_user_email" in message:
+                connection.rollback()
+                raise HTTPException(status_code=409, detail="Пользователь с таким email уже существует") from None
+            raise
+
+        user_id_value = cursor.lastrowid
+        if user_id_value is None:
+            probe = connection.execute("SELECT last_insert_rowid() AS id").fetchone()
+            user_id_value = probe["id"] if probe is not None else None
+        if user_id_value is None:
+            connection.rollback()
+            raise RuntimeError("Не удалось получить идентификатор нового пользователя")
+        user_id = int(user_id_value)
+
+        session_token, csrf_token = create_session(user_id, connection=connection)
         connection.commit()
+    except HTTPException:
+        raise
+    except Exception:
+        connection.rollback()
+        raise
     finally:
         connection.close()
 
-    session_token, csrf_token = create_session(user_id)
-    response = JSONResponse({"ok": True, "user": {"id": user_id, "name": name, "email": email}})
+    response = JSONResponse(
+        {
+            "ok": True,
+            "authenticated": True,
+            "user": {"id": user_id, "name": name, "email": email},
+        }
+    )
     set_session_cookie(response, request, session_token)
     set_csrf_cookie(response, request, csrf_token)
     return response

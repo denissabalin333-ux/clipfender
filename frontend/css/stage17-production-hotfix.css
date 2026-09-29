@@ -1,0 +1,42 @@
+/*
+ * ClipFender Stage 17 production hotfix.
+ * These rules are deliberately page-scoped. They make the runtime contract
+ * robust even if an older cached stylesheet is restored on an archive page.
+ */
+body.cf4-active .cf4-search-field > svg,
+body.cf4-active .cf4-search-field > svg.cf4-search-icon {
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  min-height: 18px !important;
+  max-width: 18px !important;
+  max-height: 18px !important;
+  flex: 0 0 18px !important;
+  display: block !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 1.7 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  color: #b99658 !important;
+  overflow: visible !important;
+}
+body.cf4-active .cf4-search-field > svg circle,
+body.cf4-active .cf4-search-field > svg path {
+  fill: none !important;
+  stroke: currentColor !important;
+}
+body.cf4-active .content-shell > .section-title {
+  display: none !important;
+}
+body.cf4-active .cf4-results-shell {
+  overflow: hidden !important;
+}
+body.cf4-active #videos:empty {
+  min-height: 120px !important;
+}
+@media (max-width: 700px) {
+  body.cf4-active .cf4-querybar {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
