@@ -33,7 +33,7 @@ from backend.services.character_catalog import (
     resolve_character_image_path,
 )
 from backend.security import ensure_bootstrap_admin, require_admin
-from backend.database.database import get_connection, init_database, migrate_database, cleanup_cache
+from backend.database.database import REMOTE_DATABASE_ENABLED, get_connection, init_database, migrate_database, cleanup_cache
 from frontend.page_shell import render_page
 
 FRONTEND_DIR = BASE_DIR / "frontend"
@@ -179,13 +179,48 @@ if FRONTEND_DIR.exists():
 
 @app.get("/media/characters/{filename}", include_in_schema=False)
 def dynamic_character_media(filename: str):
-    # Only serve validated portrait filenames from the persistent character store.
-    if not filename.endswith("-hq.webp") or len(filename) > 120:
+    clean = filename.removesuffix(".webp").removesuffix("-hq")
+
+    if (
+        not clean
+        or len(clean) > 80
+        or not all(ch.isalnum() or ch == "-" for ch in clean)
+        or filename not in {f"{clean}-hq.webp", f"{clean}.webp"}
+    ):
         raise StarletteHTTPException(status_code=404, detail="Character portrait not found")
-    candidate = (GENERATED_DIR / filename).resolve()
+
+    if REMOTE_DATABASE_ENABLED:
+        from fastapi.responses import Response
+
+        connection = get_connection()
+        try:
+            row = connection.execute(
+                """
+                SELECT image_data, mime_type
+                FROM character_portrait_assets
+                WHERE slug = ?
+                LIMIT 1
+                """,
+                (clean,),
+            ).fetchone()
+        finally:
+            connection.close()
+
+        if not row:
+            raise StarletteHTTPException(status_code=404, detail="Character portrait not found")
+
+        return Response(
+            content=bytes(row["image_data"]),
+            media_type=str(row["mime_type"] or "image/webp"),
+            headers={"Cache-Control": "public, max-age=86400"},
+        )
+
+    candidate = (GENERATED_DIR / f"{clean}-hq.webp").resolve()
     storage_root = GENERATED_DIR.resolve()
+
     if storage_root not in candidate.parents or not candidate.is_file():
         raise StarletteHTTPException(status_code=404, detail="Character portrait not found")
+
     return FileResponse(
         candidate,
         media_type="image/webp",
@@ -254,6 +289,10 @@ def _available_character_catalog() -> list[dict]:
     catalog: list[dict] = []
     for profile in merged_catalog():
         image = str(profile.get("image") or "")
+        if REMOTE_DATABASE_ENABLED and image.startswith("/media/characters/"):
+            catalog.append(profile)
+            continue
+
         asset_path = resolve_character_image_path(image)
         if asset_path is None or not asset_path.is_file():
             logger.warning("Skipping character %s: portrait missing at %s", profile.get("slug"), image)
@@ -519,8 +558,13 @@ def _production_config_errors() -> list[str]:
     if generation_enabled and not os.getenv("OPENAI_API_KEY", "").strip():
         errors.append("OPENAI_API_KEY is required while CHARACTER_IMAGE_GENERATION_ENABLED is enabled")
 
-    if not os.getenv("CLIPFINDER_DB_PATH", "").strip():
-        errors.append("CLIPFINDER_DB_PATH must be set for production persistent storage")
+    if not REMOTE_DATABASE_ENABLED and not os.getenv("CLIPFINDER_DB_PATH", "").strip():
+        errors.append(
+            "CLIPFINDER_DB_PATH or TURSO_DATABASE_URL must be configured for production storage"
+        )
+
+    if REMOTE_DATABASE_ENABLED and not os.getenv("TURSO_AUTH_TOKEN", "").strip():
+        errors.append("TURSO_AUTH_TOKEN is required when TURSO_DATABASE_URL is configured")
 
     # The owner must either already have an allowlisted account or provide the
     # startup bootstrap secret on first deployment. No public registration path

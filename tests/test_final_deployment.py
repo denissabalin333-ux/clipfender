@@ -3,12 +3,13 @@ from __future__ import annotations
 from pathlib import Path
 
 
-def test_render_uses_persistent_character_storage():
+def test_render_free_uses_turso_without_persistent_disk():
     render = Path("render.yaml").read_text(encoding="utf-8")
-    assert "mountPath: /var/lib/clipfender" in render
-    assert "CHARACTER_STORAGE_DIR" in render
-    assert "value: /var/lib/clipfender/characters" in render
-    assert "CLIPFINDER_DB_PATH" in render
+    assert "plan: free" in render
+    assert "disk:" not in render
+    assert "mountPath:" not in render
+    assert "TURSO_DATABASE_URL" in render
+    assert "TURSO_AUTH_TOKEN" in render
 
 
 def test_bing_image_search_is_disabled():
@@ -43,9 +44,11 @@ def test_character_discovery_endpoint_requires_csrf():
     assert "require_csrf(request)" in source
 
 
-def test_dynamic_portrait_storage_is_not_inside_source_tree_by_default_in_production():
+def test_dynamic_portrait_storage_is_not_inside_render_persistent_disk():
     source = Path("backend/services/character_catalog.py").read_text(encoding="utf-8")
-    assert 'Path("/var/lib/clipfender/characters") if APP_ENV == "production"' in source
+    assert 'DEFAULT_CHARACTER_STORAGE = BASE_DIR / "data" / "characters"' in source
+    assert 'Path("/var/lib/clipfender/characters")' not in source
+    assert "REMOTE_DATABASE_ENABLED" in source
 
 
 def test_dynamic_sitemap_is_built_per_request():
