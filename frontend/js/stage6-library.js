@@ -66,16 +66,59 @@
     window.loadMoreVideos = async function(...args) { const result = await originalLoadMore.apply(this, args); if (!restoringUrl) replaceArchiveUrl(true); return result; };
 
     window.toggleFavorite = async function(id) {
-      const key = String(id); const before = typeof originalToggleFavorite === 'function' ? null : null;
-      if (typeof originalToggleFavorite === 'function') originalToggleFavorite(id);
+      const key = String(id);
+
       try {
         const user = await currentUser();
-        if (!user) return;
+
+        if (!user) {
+          window.showToast?.('Войди в аккаунт, чтобы сохранять материалы в библиотеку.', 'error');
+          window.setTimeout(() => {
+            window.location.href = '/login';
+          }, 250);
+          return;
+        }
+
         const video = typeof videoStore !== 'undefined' ? videoStore.get(key) : null;
-        if (typeof isFavorite === 'function' && isFavorite(key)) await post('/api/library/favorites', {video_id:key, video:video || {id:key}});
-        else await del('/api/library/favorites/' + encodeURIComponent(key));
-      } catch (_) {
-        try { await syncServerFavorites(); } catch (__) {}
+        const active = typeof isFavorite === 'function' && isFavorite(key);
+
+        // Server is the source of truth. Do not mutate the local state until
+        // the database operation succeeds.
+        if (active) {
+          await del('/api/library/favorites/' + encodeURIComponent(key));
+        } else {
+          await post('/api/library/favorites', {
+            video_id: key,
+            video: video || {id: key},
+          });
+        }
+
+        // Refresh the local cache from the server after a successful mutation.
+        await syncServerFavorites();
+
+        if (typeof renderFavoriteState === 'function') {
+          renderFavoriteState(key);
+        }
+
+        window.showToast?.(
+          active ? 'Материал убран из избранного.' : 'Материал сохранён в библиотеку.',
+          'success'
+        );
+      } catch (error) {
+        window.showToast?.(
+          error?.message || 'Не удалось изменить избранное.',
+          'error'
+        );
+
+        // Recover the visible state from the server.
+        try {
+          await syncServerFavorites();
+          if (typeof renderFavoriteState === 'function') {
+            renderFavoriteState(key);
+          }
+        } catch (_) {
+          // Keep the original error visible.
+        }
       }
     };
 
@@ -127,7 +170,15 @@
     if (restore.q && [...new URLSearchParams(location.search).keys()].some(k => k !== 'q')) queueMicrotask(() => restoreArchiveState(restore));
     addEventListener('popstate', () => { const state = applyUrl(); if (!state.q) return; restoreArchiveState(state); });
 
-    currentUser().then(user => { if (user) syncServerFavorites(); }).catch(() => {});
+    currentUser().then(user => {
+      if (user) syncServerFavorites().catch(() => {});
+    }).catch(() => {});
+
+    window.addEventListener('clipfender:auth-changed', event => {
+      if (event.detail?.authenticated) {
+        syncServerFavorites().catch(() => {});
+      }
+    });
 
     document.addEventListener('DOMContentLoaded', () => {
       const toolbar = document.querySelector('.toolbar');
