@@ -485,8 +485,220 @@ def _duration_seconds(value):
     return 0
 
 
-def _edit_suitability_components(video, query=None, film=None):
-    """Calculate all Stage 13 suitability components from stored signals only."""
+def _intent_signal_score(video, search_intent=None):
+    """Score metadata signals that match the requested edit intent.
+
+    This remains metadata-only. It does not claim to inspect actual frames,
+    timestamps, motion vectors or the audio waveform.
+    """
+    intent = str(search_intent or "").strip().lower()
+    text = _text_blob(video)
+    title = _title_text(video)
+
+    scores = {
+        "best_edit": 0.0,
+        "action": 0.0,
+        "cinematic": 0.0,
+        "raw_scene": 0.0,
+        "scene_pack": 0.0,
+        "slow_motion": 0.0,
+        "dialogue": 0.0,
+        "emotion": 0.0,
+    }
+
+    # --------------------------------------------------------
+    # Shared source-quality signals
+    # --------------------------------------------------------
+
+    if video.get("is_scene_pack"):
+        scores["best_edit"] += 3
+        scores["raw_scene"] += 6
+        scores["scene_pack"] += 8
+
+    if video.get("is_raw_footage"):
+        scores["best_edit"] += 3
+        scores["raw_scene"] += 7
+
+    if video.get("is_clean"):
+        scores["raw_scene"] += 3
+        scores["cinematic"] += 1
+        scores["best_edit"] += 1
+
+    if video.get("is_4k"):
+        scores["best_edit"] += 2
+        scores["cinematic"] += 1
+
+    if video.get("is_hd"):
+        scores["best_edit"] += 1
+
+    # --------------------------------------------------------
+    # Action
+    # --------------------------------------------------------
+
+    if video.get("is_action"):
+        scores["action"] += 7
+
+    if video.get("is_dynamic"):
+        scores["action"] += 6
+
+    for phrase, points in (
+        ("fight scene", 7),
+        ("battle scene", 7),
+        ("action scene", 6),
+        ("combat", 5),
+        ("chase", 4),
+        ("war scene", 4),
+        ("fight", 3),
+        ("battle", 3),
+    ):
+        if phrase in text:
+            scores["action"] += points
+
+    # --------------------------------------------------------
+    # Cinematic
+    # --------------------------------------------------------
+
+    if video.get("is_cinematic"):
+        scores["cinematic"] += 7
+
+    for phrase, points in (
+        ("cinematic scene", 7),
+        ("movie scene", 6),
+        ("film scene", 6),
+        ("dramatic scene", 5),
+        ("wide shot", 4),
+        ("close up", 4),
+        ("close-up", 4),
+        ("cinematic", 4),
+    ):
+        if phrase in text:
+            scores["cinematic"] += points
+
+    # --------------------------------------------------------
+    # Raw source / scene pack
+    # --------------------------------------------------------
+
+    if video.get("is_raw_footage"):
+        scores["raw_scene"] += 6
+
+    if video.get("is_scene_pack"):
+        scores["raw_scene"] += 6
+
+    for phrase, points in (
+        ("raw footage", 8),
+        ("raw scene", 7),
+        ("scene pack", 7),
+        ("scenepack", 7),
+        ("clean footage", 6),
+        ("unedited", 5),
+        ("un-edited", 5),
+        ("raw clips", 5),
+    ):
+        if phrase in text:
+            scores["raw_scene"] += points
+
+    # --------------------------------------------------------
+    # Slow motion
+    # --------------------------------------------------------
+
+    fps_signal = _clamp_score(
+        video.get("slow_motion_fps_signal", 0),
+        0,
+        120,
+    )
+
+    if fps_signal >= 120:
+        scores["slow_motion"] += 14
+    elif fps_signal >= 60:
+        scores["slow_motion"] += 9
+
+    for phrase, points in (
+        ("slow motion", 8),
+        ("120fps", 7),
+        ("120 fps", 7),
+        ("60fps", 5),
+        ("60 fps", 5),
+        ("high fps", 4),
+    ):
+        if phrase in text:
+            scores["slow_motion"] += points
+
+    # --------------------------------------------------------
+    # Dialogue
+    # --------------------------------------------------------
+
+    if video.get("is_dialogue"):
+        scores["dialogue"] += 8
+
+    if video.get("has_dialogue"):
+        scores["dialogue"] += 5
+
+    for phrase, points in (
+        ("dialogue scene", 8),
+        ("conversation", 6),
+        ("monologue", 6),
+        ("speech", 5),
+        ("talking", 3),
+        ("dialogue", 4),
+    ):
+        if phrase in text:
+            scores["dialogue"] += points
+
+    # --------------------------------------------------------
+    # Emotion
+    # --------------------------------------------------------
+
+    if video.get("is_emotion"):
+        scores["emotion"] += 8
+
+    for phrase, points in (
+        ("emotional scene", 8),
+        ("sad scene", 7),
+        ("death scene", 7),
+        ("romantic scene", 6),
+        ("crying", 6),
+        ("tears", 5),
+        ("breakdown", 5),
+        ("angry scene", 5),
+        ("emotional", 4),
+        ("sad", 3),
+        ("angry", 3),
+    ):
+        if phrase in text:
+            scores["emotion"] += points
+
+    return min(
+        20.0,
+        max(
+            0.0,
+            scores.get(intent, 0.0),
+        ),
+    )
+
+
+def _intent_signal_label(search_intent):
+    return {
+        "best_edit": "best edit",
+        "action": "action",
+        "cinematic": "cinematic",
+        "raw_scene": "raw scene",
+        "scene_pack": "scene pack",
+        "slow_motion": "slow motion",
+        "dialogue": "dialogue",
+        "emotion": "emotion",
+    }.get(
+        str(search_intent or "").strip().lower(),
+        "best edit",
+    )
+
+
+def _edit_suitability_components(
+    video,
+    query=None,
+    film=None,
+    search_intent=None,
+):
+    """Calculate suitability from stored metadata plus the requested intent."""
     edit_score = _clamp_score(video.get("edit_score", 0))
     edit_component = edit_score * 0.40
 
@@ -542,7 +754,16 @@ def _edit_suitability_components(video, query=None, film=None):
     if duration_penalty:
         duration_label = "очень длинный источник"
 
-    relevance, relevance_parts = _query_relevance_details(video, query=query, film=film)
+    relevance, relevance_parts = _query_relevance_details(
+        video,
+        query=query,
+        film=film,
+    )
+
+    intent_signal = _intent_signal_score(
+        video,
+        search_intent=search_intent,
+    )
 
     audio_raw = 0.0
     audio_signals = []
@@ -621,6 +842,7 @@ def _edit_suitability_components(video, query=None, film=None):
         + relevance
         + audio_scene
         + positive_text
+        + intent_signal
         - penalty
     )
 
@@ -679,6 +901,11 @@ def _edit_suitability_components(video, query=None, film=None):
                 "film": film or "",
                 "signals": [f"{label}: {reason}" for label, reason in relevance_parts],
             },
+            "intent": {
+                "value": round(intent_signal, 2),
+                "max": 20,
+                "intent": _intent_signal_label(search_intent),
+            },
             "audio_scene": {
                 "value": round(audio_scene, 2),
                 "max": 5,
@@ -697,7 +924,12 @@ def _edit_suitability_components(video, query=None, film=None):
     }
 
 
-def calculate_edit_suitability(video, query=None, film=None):
+def calculate_edit_suitability(
+    video,
+    query=None,
+    film=None,
+    search_intent=None,
+):
     """Return the Stage 13 0-100 edit suitability score.
 
     The ranking uses only information already available in the current
@@ -705,7 +937,12 @@ def calculate_edit_suitability(video, query=None, film=None):
     clip length and explicit cleanliness/junk signals without inventing
     visual detection, scene timestamps or true measured tempo.
     """
-    calculated = _edit_suitability_components(video, query=query, film=film)
+    calculated = _edit_suitability_components(
+        video,
+        query=query,
+        film=film,
+        search_intent=search_intent,
+    )
     return {
         "score": calculated["score"],
         "estimated": calculated["estimated"],
@@ -717,9 +954,19 @@ def calculate_edit_suitability(video, query=None, film=None):
 # EDIT SUITABILITY EXPLANATION
 # ============================================================
 
-def explain_edit_suitability(video, query=None, film=None):
-    """Return the Stage 13 score plus a human-readable contribution breakdown."""
-    calculated = _edit_suitability_components(video, query=query, film=film)
+def explain_edit_suitability(
+    video,
+    query=None,
+    film=None,
+    search_intent=None,
+):
+    """Return suitability plus a human-readable contribution breakdown."""
+    calculated = _edit_suitability_components(
+        video,
+        query=query,
+        film=film,
+        search_intent=search_intent,
+    )
     return {
         "score": calculated["score"],
         "estimated": calculated["estimated"],

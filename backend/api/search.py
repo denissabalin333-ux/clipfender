@@ -630,6 +630,8 @@ def apply_filters(
     duration_max=0,
     filter_mode="smart",
     film=None,
+    fps_signal=0,
+    caption_mode=None,
 ):
 
     results = list(videos)
@@ -831,6 +833,74 @@ def apply_filters(
             if bool(video.get("is_raw_footage", False))
         ]
 
+    elif filter_mode == "strict" and material_type == "scene_pack":
+
+        results = [
+            video
+            for video in results
+            if bool(video.get("is_scene_pack", False))
+        ]
+
+    elif filter_mode == "strict" and material_type == "dialogue":
+
+        results = [
+            video
+            for video in results
+            if bool(video.get("is_dialogue", False))
+        ]
+
+    elif filter_mode == "strict" and material_type == "emotion":
+
+        results = [
+            video
+            for video in results
+            if bool(video.get("is_emotion", False))
+        ]
+
+    # --------------------------------------------------------
+    # Slow-motion signal
+    # --------------------------------------------------------
+
+    if fps_signal >= 120:
+
+        results = [
+            video
+            for video in results
+            if safe_float(
+                video.get("slow_motion_fps_signal", 0)
+            ) >= 120
+        ]
+
+    elif fps_signal >= 60:
+
+        results = [
+            video
+            for video in results
+            if safe_float(
+                video.get("slow_motion_fps_signal", 0)
+            ) >= 60
+        ]
+
+    # --------------------------------------------------------
+    # YouTube CC availability
+    # --------------------------------------------------------
+
+    if caption_mode == "none":
+
+        results = [
+            video
+            for video in results
+            if not bool(video.get("has_captions", False))
+        ]
+
+    elif caption_mode == "available":
+
+        results = [
+            video
+            for video in results
+            if bool(video.get("has_captions", False))
+        ]
+
     # --------------------------------------------------------
     # Video type
     # --------------------------------------------------------
@@ -855,7 +925,15 @@ def apply_filters(
     # Quality
     # --------------------------------------------------------
 
-    if quality == "hd":
+    if quality == "4k":
+
+        results = [
+            video
+            for video in results
+            if bool(video.get("is_4k", False))
+        ]
+
+    elif quality == "hd":
 
         results = [
             video
@@ -902,6 +980,9 @@ def apply_preferences(videos, has_music=None, has_voice=None, has_dialogue=None,
                 "action": bool(video.get("is_action", False)),
                 "gameplay": bool(video.get("is_gameplay", False)),
                 "raw_footage": bool(video.get("is_raw_footage", False)),
+                "scene_pack": bool(video.get("is_scene_pack", False)),
+                "dialogue": bool(video.get("is_dialogue", False)),
+                "emotion": bool(video.get("is_emotion", False)),
             }
             if matches.get(material_type, False):
                 bonus += 18
@@ -917,7 +998,13 @@ def apply_preferences(videos, has_music=None, has_voice=None, has_dialogue=None,
 # SORT
 # ============================================================
 
-def sort_videos(videos, sort, query=None, film=None):
+def sort_videos(
+    videos,
+    sort,
+    query=None,
+    film=None,
+    search_intent=None,
+):
     """Always rank edit-suitable material first, then apply the user sort.
 
     This is intentionally backend-side so archive, normal search, cached results,
@@ -926,7 +1013,12 @@ def sort_videos(videos, sort, query=None, film=None):
     ordered = list(videos)
 
     for video in ordered:
-        suitability = calculate_edit_suitability(video, query=query, film=film)
+        suitability = calculate_edit_suitability(
+            video,
+            query=query,
+            film=film,
+            search_intent=search_intent,
+        )
         video["edit_suitability_score"] = suitability["score"]
         video["score_estimated"] = suitability["estimated"]
         video["score_version"] = suitability["version"]
@@ -1021,6 +1113,54 @@ def build_response(
 
 
 # ============================================================
+# SEARCH INTENT
+# ============================================================
+
+SEARCH_INTENT_ALIASES = {
+    "best": "best_edit",
+    "best_edit": "best_edit",
+    "action": "action",
+    "cinematic": "cinematic",
+    "raw": "raw_scene",
+    "raw_scene": "raw_scene",
+    "raw_footage": "raw_scene",
+    "scene_pack": "scene_pack",
+    "slow": "slow_motion",
+    "slow_motion": "slow_motion",
+    "dialogue": "dialogue",
+    "emotion": "emotion",
+    "gameplay": "best_edit",
+}
+
+
+def _resolve_search_intent(
+    requested: str | None,
+    material_type: str | None = None,
+) -> str:
+    value = requested or material_type or "best_edit"
+    value = " ".join(
+        str(value).strip().lower().split()
+    )
+
+    if not value:
+        return "best_edit"
+
+    resolved = SEARCH_INTENT_ALIASES.get(value)
+
+    if resolved is None:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "search_intent должен быть: "
+                "best_edit, action, cinematic, raw_scene, "
+                "slow_motion, dialogue или emotion"
+            ),
+        )
+
+    return resolved
+
+
+# ============================================================
 # SEARCH
 # ============================================================
 
@@ -1043,7 +1183,12 @@ def search(
     duration_max: int = 0,
     filter_mode: str = "smart",
 
+    fps_signal: int = 0,
+    caption_mode: str | None = None,
+    search_intent: str | None = None,
+
     video_type: str | None = None,
+
     quality: str | None = None,
     min_views: int = 0,
     sort: str = "score",
@@ -1056,6 +1201,10 @@ def search(
 
     query = _validate_search_query(query)
     film = _validate_search_query(film or "") if film else ""
+    search_intent = _resolve_search_intent(
+        search_intent,
+        material_type,
+    )
 
     if not query:
 
@@ -1086,6 +1235,20 @@ def search(
     if duration_max and duration_min and duration_max < duration_min:
         duration_min, duration_max = duration_max, duration_min
 
+    fps_signal = max(0, int(fps_signal or 0))
+
+    if fps_signal not in (0, 60, 120):
+        raise HTTPException(
+            status_code=400,
+            detail="fps_signal должен быть 60 или 120",
+        )
+
+    if caption_mode not in (None, "none", "available"):
+        raise HTTPException(
+            status_code=400,
+            detail="caption_mode должен быть none или available",
+        )
+
     if filter_mode not in ("smart", "strict"):
         raise HTTPException(status_code=400, detail="filter_mode должен быть smart или strict")
 
@@ -1104,6 +1267,7 @@ def search(
 
     if quality not in (
         None,
+        "4k",
         "hd",
         "sd",
     ):
@@ -1111,7 +1275,7 @@ def search(
             status_code=400,
             detail=(
                 "quality должен быть "
-                "'hd' или 'sd'"
+                "'4k', 'hd' или 'sd'"
             ),
         )
 
@@ -1122,12 +1286,15 @@ def search(
         "action",
         "gameplay",
         "raw_footage",
+        "scene_pack",
+        "dialogue",
+        "emotion",
     ):
         raise HTTPException(
             status_code=400,
             detail=(
                 "material_type должен быть: "
-                "best_edit, cinematic, action, gameplay или raw_footage"
+                "best_edit, cinematic, action, gameplay, raw_footage, scene_pack, dialogue или emotion"
             ),
         )
 
@@ -1160,8 +1327,10 @@ def search(
     # One shared pool per unique query.
     # Filter values are not part of the cache key.
     cache_key = (
-        "clipfinder_shared:"
+        "clipfender_shared:v3:"
         + normalized_query
+        + ":"
+        + search_intent
     )
 
     # ========================================================
@@ -1219,6 +1388,8 @@ def search(
             duration_max=duration_max,
             filter_mode=filter_mode,
             film=film,
+            fps_signal=fps_signal,
+            caption_mode=caption_mode,
         )
 
         if filter_mode == "smart":
@@ -1228,6 +1399,7 @@ def search(
             sort,
             query=query,
             film=film,
+            search_intent=search_intent,
         )
         for video in results:
             video.pop("preference_score", None)
@@ -1282,6 +1454,7 @@ def search(
             limit=SAFE_YOUTUBE_FETCH_LIMIT,
             return_total=True,
             return_next_page_token=True,
+            search_intent=search_intent,
         )
 
     except Exception as error:
@@ -1336,6 +1509,7 @@ def search(
         "score",
         query=query,
         film=film,
+        search_intent=search_intent,
     )
 
     # ========================================================
@@ -1381,6 +1555,8 @@ def search(
         duration_max=duration_max,
         filter_mode=filter_mode,
         film=film,
+        fps_signal=fps_signal,
+        caption_mode=caption_mode,
     )
 
     # ========================================================
@@ -1401,6 +1577,7 @@ def search(
         sort,
         query=query,
         film=film,
+        search_intent=search_intent,
     )
 
     for video in results:
@@ -1440,12 +1617,19 @@ def search(
 def load_more(
     request: Request,
     query: str,
+    search_intent: str | None = None,
 ):
     _check_public_rate_limit(request)
     query = _validate_search_query(query, required=True)
 
     normalized_query = _normalized_query(query)
-    cache_key = "clipfinder_shared:" + normalized_query
+    search_intent = _resolve_search_intent(search_intent)
+    cache_key = (
+        "clipfender_shared:v3:"
+        + normalized_query
+        + ":"
+        + search_intent
+    )
     state = get_search_state(cache_key)
 
     if not state or not state.get("next_page_token"):
@@ -1470,6 +1654,7 @@ def load_more(
             return_total=True,
             page_token=str(state.get("next_page_token") or ""),
             return_next_page_token=True,
+            search_intent=search_intent,
         )
     except Exception as error:
         logger.exception("YouTube load-more failed for query=%r", query, exc_info=error)

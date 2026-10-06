@@ -710,10 +710,35 @@ body:has(.home-hero):before,body:has(.page-hero):before{
         <div class="filter-box"><label for="hasMusic">Музыка</label><select id="hasMusic"><option value="">Все</option><option value="true">С музыкой</option><option value="false">Без музыки</option></select></div>
         <div class="filter-box"><label for="hasVoice">Голос</label><select id="hasVoice"><option value="">Все</option><option value="true">Есть голос</option><option value="false">Без голоса</option></select></div>
         <div class="filter-box"><label for="hasDialogue">Диалог</label><select id="hasDialogue"><option value="">Все</option><option value="true">Есть диалог</option><option value="false">Без диалога</option></select></div>
-        <div class="filter-box"><label for="materialType">Тип материала</label><select id="materialType"><option value="">Все</option><option value="best_edit">★ Лучшие для эдита</option><option value="cinematic">Cinematic</option><option value="action">Action</option><option value="gameplay">Gameplay</option><option value="raw_footage">Raw footage</option></select></div>
+        <div class="filter-box"><label for="materialType">Тип материала</label><select id="materialType"><option value="">Все</option><option value="best_edit">★ Лучшие для эдита</option><option value="scene_pack">🎬 Scene Pack</option><option value="raw_footage">🎞 Raw Footage</option><option value="action">⚔ Action</option><option value="dialogue">💬 Dialogue</option><option value="emotion">❤ Emotion</option><option value="cinematic">🌑 Cinematic</option><option value="gameplay">Gameplay</option></select></div>
         <div class="filter-box"><label for="filterMode">Режим фильтров</label><select id="filterMode"><option value="smart">Умный — сначала подходящее</option><option value="strict">Строгий — только совпадения</option></select></div>
         <div class="filter-box"><label for="editMinScore">Минимум Edit Score</label><select id="editMinScore"><option value="0">Любой</option><option value="60">60+ — хороший</option><option value="75">75+ — очень хороший</option><option value="90">90+ — топ</option></select></div>
-        <div class="filter-box"><label for="durationRange">Длительность</label><select id="durationRange"><option value="0">Любая</option><option value="30">до 30 сек</option><option value="60">до 1 мин</option><option value="180">до 3 мин</option><option value="600">до 10 мин</option></select></div>
+        <div class="filter-box"><label for="durationRange">Длительность</label><select id="durationRange"><option value="0">Любая</option><option value="0-30">до 30 сек</option><option value="30-60">30–60 сек</option><option value="60-180">1–3 мин</option><option value="180-600">3–10 мин</option><option value="600-0">10+ мин</option></select></div>
+        <div class="filter-box">
+          <label for="quality">Разрешение</label>
+          <select id="quality">
+            <option value="">Любое</option>
+            <option value="4k">4K</option>
+            <option value="hd">HD+</option>
+            <option value="sd">SD</option>
+          </select>
+        </div>
+        <div class="filter-box">
+          <label for="fpsSignal">Slow Motion</label>
+          <select id="fpsSignal">
+            <option value="0">Любой</option>
+            <option value="60">60 FPS signal+</option>
+            <option value="120">120 FPS signal+</option>
+          </select>
+        </div>
+        <div class="filter-box">
+          <label for="captionMode">CC</label>
+          <select id="captionMode">
+            <option value="">Не важно</option>
+            <option value="none">Без CC</option>
+            <option value="available">С CC</option>
+          </select>
+        </div>
         <div class="filter-box filter-box--wide"><label for="film">Фильм / сериал</label><input id="film" type="text" maxlength="120" placeholder="Например: Game of Thrones" autocomplete="off"></div>
       </div>
       <div class="sort-box"><label for="sort">Сортировка</label><select id="sort"><option value="score">⚔ Лучшие материалы для эдита</option><option value="views">Просмотры</option><option value="newest">Новые</option><option value="oldest">Старые</option></select></div>
@@ -964,6 +989,52 @@ function updateStatus(
 
 
     /* =====================================================
+       SEARCH INTENT
+    ===================================================== */
+
+    function getSearchIntent() {
+
+        const materialType =
+            document.getElementById("materialType")?.value || "";
+
+        const fpsSignal =
+            document.getElementById("fpsSignal")?.value || "0";
+
+        /*
+         * Explicit material intent wins when the user selected one.
+         * "best_edit" is the neutral default, so an explicit slow-motion
+         * signal can become the retrieval intent when no other intent was
+         * chosen.
+         */
+
+        if (materialType && materialType !== "best_edit") {
+
+            if (
+                materialType === "raw_footage" ||
+                materialType === "scene_pack"
+            ) {
+                return "raw_scene";
+            }
+
+            if (
+                materialType === "action" ||
+                materialType === "cinematic" ||
+                materialType === "dialogue" ||
+                materialType === "emotion"
+            ) {
+                return materialType;
+            }
+        }
+
+        if (fpsSignal === "60" || fpsSignal === "120") {
+            return "slow_motion";
+        }
+
+        return "best_edit";
+    }
+
+
+    /* =====================================================
        BUILD API URL
     ===================================================== */
 
@@ -1008,6 +1079,11 @@ function updateStatus(
         params.set(
             "page",
             String(page)
+        );
+
+        params.set(
+            "search_intent",
+            getSearchIntent()
         );
 
 
@@ -1135,6 +1211,21 @@ function updateStatus(
             params.set("filter_mode", filterModeElement.value || "smart");
         }
 
+        const qualityElement = document.getElementById("quality");
+        if (qualityElement && qualityElement.value !== "") {
+            params.set("quality", qualityElement.value);
+        }
+
+        const fpsSignalElement = document.getElementById("fpsSignal");
+        if (fpsSignalElement && fpsSignalElement.value !== "0") {
+            params.set("fps_signal", fpsSignalElement.value);
+        }
+
+        const captionModeElement = document.getElementById("captionMode");
+        if (captionModeElement && captionModeElement.value !== "") {
+            params.set("caption_mode", captionModeElement.value);
+        }
+
         const editMinScoreElement = document.getElementById("editMinScore");
         if (editMinScoreElement && editMinScoreElement.value !== "0") {
             params.set("edit_min_score", editMinScoreElement.value);
@@ -1142,7 +1233,20 @@ function updateStatus(
 
         const durationRangeElement = document.getElementById("durationRange");
         if (durationRangeElement && durationRangeElement.value !== "0") {
-            params.set("duration_max", durationRangeElement.value);
+            const parts = String(durationRangeElement.value).split("-");
+            const min = Number(parts[0] || 0);
+            const max = Number(parts[1] || 0);
+
+            params.delete("duration_min");
+            params.delete("duration_max");
+
+            if (Number.isFinite(min) && min > 0) {
+                params.set("duration_min", String(min));
+            }
+
+            if (Number.isFinite(max) && max > 0) {
+                params.set("duration_max", String(max));
+            }
         }
 
         const filmElement = document.getElementById("film");
@@ -1827,8 +1931,14 @@ function updateStatus(
         loadMoreButton.textContent = "⏳ Загружаем...";
 
         try {
+            const searchIntent = getSearchIntent();
+
             const response = await fetch(
-                API_URL + "/api/load-more?query=" + encodeURIComponent(currentQuery),
+                API_URL +
+                "/api/load-more?query=" +
+                encodeURIComponent(currentQuery) +
+                "&search_intent=" +
+                encodeURIComponent(searchIntent),
                 { headers: { "Accept": "application/json" } }
             );
 

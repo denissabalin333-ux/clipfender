@@ -52,6 +52,250 @@ DEFAULT_LIMIT = 100
 MAX_LIMIT = 500
 
 
+# ============================================================
+# EDIT SEARCH SIGNALS
+# ============================================================
+
+EDIT_QUERY_NEGATIVE_TERMS = (
+    "-reaction "
+    "-review "
+    "-podcast "
+    "-commentary "
+    "-tutorial "
+    "-amv "
+    "-twixtor "
+    "-stream "
+    '-"fan edit" '
+    '-"full episode" '
+    '-"complete episode"'
+)
+
+
+EDIT_SEARCH_INTENTS = {
+    "best_edit": (
+        "scene",
+        '"scene pack"',
+        '"raw scene"',
+        '"cinematic scene"',
+        '"movie scene"',
+        "clip",
+    ),
+    "action": (
+        '"fight scene"',
+        '"battle scene"',
+        "combat",
+        '"action scene"',
+        "chase",
+    ),
+    "cinematic": (
+        '"cinematic scene"',
+        '"movie scene"',
+        '"film scene"',
+        '"dramatic scene"',
+        '"wide shot"',
+        '"close up"',
+    ),
+    "raw_scene": (
+        '"raw scene"',
+        '"raw footage"',
+        "scenepack",
+        '"scene pack"',
+        '"clean footage"',
+        "unedited",
+    ),
+    "scene_pack": (
+        '"scene pack"',
+        "scenepack",
+        '"raw scene"',
+        '"raw footage"',
+        '"clean footage"',
+    ),
+    "slow_motion": (
+        '"slow motion"',
+        "60fps",
+        "120fps",
+        '"60 fps"',
+        '"120 fps"',
+        '"high fps"',
+    ),
+    "dialogue": (
+        '"dialogue scene"',
+        "conversation",
+        "monologue",
+        "speech",
+        "talking",
+    ),
+    "emotion": (
+        '"emotional scene"',
+        '"sad scene"',
+        "crying",
+        "tears",
+        "angry",
+        "breakdown",
+        '"death scene"',
+        '"romantic scene"',
+    ),
+}
+
+
+INTENT_ALIASES = {
+    "best": "best_edit",
+    "best_edit": "best_edit",
+    "action": "action",
+    "cinematic": "cinematic",
+    "raw": "raw_scene",
+    "raw_scene": "raw_scene",
+    "raw_footage": "raw_scene",
+    "scene_pack": "scene_pack",
+    "slow": "slow_motion",
+    "slow_motion": "slow_motion",
+    "dialogue": "dialogue",
+    "emotion": "emotion",
+}
+
+
+def normalize_edit_intent(intent: str | None) -> str:
+    """Normalize a public edit intent to one supported retrieval profile."""
+    value = " ".join(
+        str(intent or "").strip().lower().split()
+    )
+
+    if not value:
+        return "best_edit"
+
+    return INTENT_ALIASES.get(
+        value,
+        "best_edit",
+    )
+
+
+def build_edit_search_query(
+    query: str,
+    intent: str | None = None,
+) -> str:
+    """Build an edit-oriented YouTube retrieval query.
+
+    The user's character/topic query remains present in every alternative.
+    Intent terms create several semantically related retrieval branches while
+    the negative terms suppress common non-source material such as reactions,
+    reviews, podcasts and fan edits.
+
+    The Google client receives the pipe character as a Boolean OR expression.
+    """
+    clean = " ".join(
+        str(query or "").strip().split()
+    )
+
+    if not clean:
+        return ""
+
+    normalized_intent = normalize_edit_intent(intent)
+    variants = EDIT_SEARCH_INTENTS[normalized_intent]
+
+    branches = [
+        f"{clean} {variant}"
+        for variant in variants
+    ]
+
+    joined = " | ".join(branches)
+
+    return f"{joined} {EDIT_QUERY_NEGATIVE_TERMS}".strip()
+
+
+def _classify_edit_signals(title: str, description: str) -> dict:
+    """Classify practical edit-oriented signals from public metadata only."""
+    text = " ".join(
+        str(value or "").lower()
+        for value in (title, description)
+    )
+
+    scene_pack_terms = (
+        "scene pack",
+        "scenepack",
+        "scene collection",
+        "clip pack",
+        "raw clips",
+        "raw scenes",
+    )
+
+    dialogue_terms = (
+        "dialogue",
+        "dialog",
+        "conversation",
+        "speech",
+        "monologue",
+    )
+
+    emotion_terms = (
+        "emotional",
+        "emotion",
+        "sad scene",
+        "crying",
+        "tears",
+        "angry scene",
+        "breakdown",
+        "death scene",
+        "romantic scene",
+    )
+
+    cinematic_terms = (
+        "cinematic",
+        "cinematic scene",
+        "movie scene",
+        "film scene",
+    )
+
+    action_terms = (
+        "action",
+        "fight",
+        "battle",
+        "combat",
+        "chase",
+        "war scene",
+    )
+
+    raw_terms = (
+        "raw footage",
+        "raw scenes",
+        "raw clips",
+        "clean footage",
+        "un-edited",
+        "unedited",
+    )
+
+    fps_signal = 0
+
+    for match in re.finditer(
+        r"(?<!\d)(120|100|90|60|59\.94|50)\s*(?:fps|frame\s*per\s*second)",
+        text,
+        flags=re.IGNORECASE,
+    ):
+        try:
+            value = float(match.group(1))
+            if value >= 59:
+                normalized = 60 if value < 90 else int(value)
+                fps_signal = max(fps_signal, normalized)
+        except (TypeError, ValueError):
+            pass
+
+    compact = text.replace(" ", "")
+    if "120fps" in compact:
+        fps_signal = max(fps_signal, 120)
+    if "60fps" in compact or "59.94fps" in compact:
+        fps_signal = max(fps_signal, 60)
+
+    return {
+        "is_scene_pack": any(term in text for term in scene_pack_terms),
+        "is_dialogue": any(term in text for term in dialogue_terms),
+        "is_emotion": any(term in text for term in emotion_terms),
+        "is_cinematic": any(term in text for term in cinematic_terms),
+        "is_action": any(term in text for term in action_terms),
+        "is_raw_footage": any(term in text for term in raw_terms),
+        "slow_motion_fps_signal": fps_signal,
+        "is_slow_motion_ready": fps_signal >= 60,
+    }
+
+
 
 
 
@@ -446,7 +690,9 @@ def _get_video_details(
 
                         "statistics,"
 
-                        "contentDetails"
+                        "contentDetails,"
+
+                        "status"
 
                     ),
 
@@ -508,6 +754,13 @@ def _get_video_details(
 
                     item.get(
                         "contentDetails",
+                        {}
+                    ),
+
+                "status":
+
+                    item.get(
+                        "status",
                         {}
                     ),
 
@@ -1070,6 +1323,7 @@ def search_youtube(
     return_total: bool = False,
     page_token: str | None = None,
     return_next_page_token: bool = False,
+    search_intent: str | None = None,
 ):
 
 
@@ -1164,7 +1418,10 @@ def search_youtube(
 
             "q":
 
-                query,
+                build_edit_search_query(
+                    query,
+                    search_intent,
+                ),
 
 
 
@@ -1436,6 +1693,34 @@ def search_youtube(
 
 
 
+
+            caption_value = str(
+                content.get(
+                    "caption",
+                    "false",
+                )
+                or "false"
+            ).lower()
+
+            status = (
+                detail.get(
+                    "status",
+                    {}
+                )
+                or {}
+            )
+
+            video["has_captions"] = caption_value == "true"
+            video["is_embeddable"] = bool(
+                status.get("embeddable", False)
+            )
+
+            video.update(
+                _classify_edit_signals(
+                    video.get("title", ""),
+                    video.get("description", ""),
+                )
+            )
 
             if (
 

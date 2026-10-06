@@ -22,6 +22,10 @@
     'durationRange',
     'film',
     'sort',
+
+    "quality",
+    "fpsSignal",
+    "captionMode",
   ];
 
   const hasQuery = () => {
