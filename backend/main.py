@@ -343,7 +343,7 @@ def character_profile(request: Request, slug: str):
         "url": canonical,
         "image": (PUBLIC_BASE_URL or str(request.base_url).rstrip("/")) + character["image"],
         "mainEntity": {
-            "@type": "Thing",
+            "@type": "Person",
             "name": character["name"],
         },
     }
