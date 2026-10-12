@@ -25,7 +25,7 @@
       if (!host) return;
       host.innerHTML = results.map((video) => `
         <article class="cf10-video-card">
-          <img src="${esc(video.thumbnail || '/static/assets/reference/final-real/world-castle-real.webp')}" loading="lazy" alt="">
+          <img src="${esc(video.thumbnail || '/static/assets/reference/final-real/world-castle-real.webp')}" loading="lazy" alt="${esc(video.title || 'Без названия')}">
           <h3>${esc(video.title || 'Без названия')}</h3>
           <div class="cf10-video-meta"><span>${esc(video.channel || 'YouTube')}</span>${formatScore(video)}</div>
           <div class="cf10-video-actions"><a href="/video?id=${encodeURIComponent(video.id)}">ОТКРЫТЬ</a><a href="${esc(video.url || '#')}" target="_blank" rel="noopener noreferrer">YOUTUBE ↗</a></div>

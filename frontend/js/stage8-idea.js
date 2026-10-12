@@ -171,7 +171,7 @@
       }
       results.innerHTML = list.map(video => `
         <article class="cf8-result-card">
-          <div class="cf8-thumb"><img src="${esc(video.thumbnail || '')}" alt="" loading="lazy"></div>
+          <div class="cf8-thumb"><img src="${esc(video.thumbnail || '')}" alt="${esc(video.title || 'Без названия')}" loading="lazy"></div>
           <div>
             <h2 class="cf8-result-title">${esc(video.title || 'Без названия')}</h2>
             <div class="cf8-meta">${esc(video.channel || 'Источник YouTube')} · ${esc(video.duration || '')} · ${video.score_estimated ? 'оценка по доступным сигналам' : 'расчётный score'}</div>
@@ -215,7 +215,7 @@
                 ${stage.items.map((item, index) => `
                   <article class="cf8-stage-card">
                     <div class="cf8-stage-card__number">${String(index + 1).padStart(2, '0')}</div>
-                    <div class="cf8-stage-card__img"><img src="${esc(item.thumbnail || '')}" alt="" loading="lazy"></div>
+                    <div class="cf8-stage-card__img"><img src="${esc(item.thumbnail || '')}" alt="${esc(item.title || 'Без названия')}" loading="lazy"></div>
                     <div class="cf8-stage-card__body">
                       <div class="cf8-stage-card__eyebrow">${esc(stage.label || '')} · SHOT ${String(index + 1).padStart(2, '0')}</div>
                       <h4>${esc(item.title || 'Без названия')}</h4>
